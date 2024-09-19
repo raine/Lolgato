@@ -1,0 +1,600 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		F71906982C9CC444008D50F6 /* LolgatoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F71906972C9CC444008D50F6 /* LolgatoApp.swift */; };
+		F719069C2C9CC44E008D50F6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F719069B2C9CC44E008D50F6 /* Assets.xcassets */; };
+		F719069F2C9CC44E008D50F6 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F719069E2C9CC44E008D50F6 /* Preview Assets.xcassets */; };
+		F71906AA2C9CC44F008D50F6 /* LolgatoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F71906A92C9CC44F008D50F6 /* LolgatoTests.swift */; };
+		F71906B42C9CC44F008D50F6 /* LolgatoUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F71906B32C9CC44F008D50F6 /* LolgatoUITests.swift */; };
+		F71906B62C9CC44F008D50F6 /* LolgatoUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F71906B52C9CC44F008D50F6 /* LolgatoUITestsLaunchTests.swift */; };
+		F71906C32C9CC51C008D50F6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F71906C22C9CC51C008D50F6 /* AppDelegate.swift */; };
+		F71906C82C9DC13B008D50F6 /* ElgatoDeviceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F71906C72C9DC13B008D50F6 /* ElgatoDeviceManager.swift */; };
+		F71906CA2C9DC467008D50F6 /* ElgatoDiscovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = F71906C92C9DC467008D50F6 /* ElgatoDiscovery.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		F71906A62C9CC44F008D50F6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F719068C2C9CC444008D50F6 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F71906932C9CC444008D50F6;
+			remoteInfo = Lolgato;
+		};
+		F71906B02C9CC44F008D50F6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F719068C2C9CC444008D50F6 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F71906932C9CC444008D50F6;
+			remoteInfo = Lolgato;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		F71906942C9CC444008D50F6 /* Lolgato.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Lolgato.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F71906972C9CC444008D50F6 /* LolgatoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LolgatoApp.swift; sourceTree = "<group>"; };
+		F719069B2C9CC44E008D50F6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		F719069E2C9CC44E008D50F6 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		F71906A02C9CC44E008D50F6 /* Lolgato.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Lolgato.entitlements; sourceTree = "<group>"; };
+		F71906A52C9CC44F008D50F6 /* LolgatoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LolgatoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		F71906A92C9CC44F008D50F6 /* LolgatoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LolgatoTests.swift; sourceTree = "<group>"; };
+		F71906AF2C9CC44F008D50F6 /* LolgatoUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LolgatoUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		F71906B32C9CC44F008D50F6 /* LolgatoUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LolgatoUITests.swift; sourceTree = "<group>"; };
+		F71906B52C9CC44F008D50F6 /* LolgatoUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LolgatoUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		F71906C22C9CC51C008D50F6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		F71906C42C9CC74E008D50F6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		F71906C72C9DC13B008D50F6 /* ElgatoDeviceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElgatoDeviceManager.swift; sourceTree = "<group>"; };
+		F71906C92C9DC467008D50F6 /* ElgatoDiscovery.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ElgatoDiscovery.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		F71906912C9CC444008D50F6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F71906A22C9CC44F008D50F6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F71906AC2C9CC44F008D50F6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		F719068B2C9CC444008D50F6 = {
+			isa = PBXGroup;
+			children = (
+				F71906962C9CC444008D50F6 /* Lolgato */,
+				F71906A82C9CC44F008D50F6 /* LolgatoTests */,
+				F71906B22C9CC44F008D50F6 /* LolgatoUITests */,
+				F71906952C9CC444008D50F6 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		F71906952C9CC444008D50F6 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F71906942C9CC444008D50F6 /* Lolgato.app */,
+				F71906A52C9CC44F008D50F6 /* LolgatoTests.xctest */,
+				F71906AF2C9CC44F008D50F6 /* LolgatoUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		F71906962C9CC444008D50F6 /* Lolgato */ = {
+			isa = PBXGroup;
+			children = (
+				F71906C92C9DC467008D50F6 /* ElgatoDiscovery.swift */,
+				F71906C42C9CC74E008D50F6 /* Info.plist */,
+				F71906972C9CC444008D50F6 /* LolgatoApp.swift */,
+				F71906C22C9CC51C008D50F6 /* AppDelegate.swift */,
+				F719069B2C9CC44E008D50F6 /* Assets.xcassets */,
+				F71906A02C9CC44E008D50F6 /* Lolgato.entitlements */,
+				F71906C72C9DC13B008D50F6 /* ElgatoDeviceManager.swift */,
+				F719069D2C9CC44E008D50F6 /* Preview Content */,
+			);
+			path = Lolgato;
+			sourceTree = "<group>";
+		};
+		F719069D2C9CC44E008D50F6 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				F719069E2C9CC44E008D50F6 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		F71906A82C9CC44F008D50F6 /* LolgatoTests */ = {
+			isa = PBXGroup;
+			children = (
+				F71906A92C9CC44F008D50F6 /* LolgatoTests.swift */,
+			);
+			path = LolgatoTests;
+			sourceTree = "<group>";
+		};
+		F71906B22C9CC44F008D50F6 /* LolgatoUITests */ = {
+			isa = PBXGroup;
+			children = (
+				F71906B32C9CC44F008D50F6 /* LolgatoUITests.swift */,
+				F71906B52C9CC44F008D50F6 /* LolgatoUITestsLaunchTests.swift */,
+			);
+			path = LolgatoUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		F71906932C9CC444008D50F6 /* Lolgato */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F71906B92C9CC44F008D50F6 /* Build configuration list for PBXNativeTarget "Lolgato" */;
+			buildPhases = (
+				F71906902C9CC444008D50F6 /* Sources */,
+				F71906912C9CC444008D50F6 /* Frameworks */,
+				F71906922C9CC444008D50F6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Lolgato;
+			productName = Lolgato;
+			productReference = F71906942C9CC444008D50F6 /* Lolgato.app */;
+			productType = "com.apple.product-type.application";
+		};
+		F71906A42C9CC44F008D50F6 /* LolgatoTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F71906BC2C9CC44F008D50F6 /* Build configuration list for PBXNativeTarget "LolgatoTests" */;
+			buildPhases = (
+				F71906A12C9CC44F008D50F6 /* Sources */,
+				F71906A22C9CC44F008D50F6 /* Frameworks */,
+				F71906A32C9CC44F008D50F6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F71906A72C9CC44F008D50F6 /* PBXTargetDependency */,
+			);
+			name = LolgatoTests;
+			productName = LolgatoTests;
+			productReference = F71906A52C9CC44F008D50F6 /* LolgatoTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		F71906AE2C9CC44F008D50F6 /* LolgatoUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F71906BF2C9CC44F008D50F6 /* Build configuration list for PBXNativeTarget "LolgatoUITests" */;
+			buildPhases = (
+				F71906AB2C9CC44F008D50F6 /* Sources */,
+				F71906AC2C9CC44F008D50F6 /* Frameworks */,
+				F71906AD2C9CC44F008D50F6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F71906B12C9CC44F008D50F6 /* PBXTargetDependency */,
+			);
+			name = LolgatoUITests;
+			productName = LolgatoUITests;
+			productReference = F71906AF2C9CC44F008D50F6 /* LolgatoUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		F719068C2C9CC444008D50F6 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1540;
+				LastUpgradeCheck = 1540;
+				TargetAttributes = {
+					F71906932C9CC444008D50F6 = {
+						CreatedOnToolsVersion = 15.4;
+					};
+					F71906A42C9CC44F008D50F6 = {
+						CreatedOnToolsVersion = 15.4;
+						TestTargetID = F71906932C9CC444008D50F6;
+					};
+					F71906AE2C9CC44F008D50F6 = {
+						CreatedOnToolsVersion = 15.4;
+						TestTargetID = F71906932C9CC444008D50F6;
+					};
+				};
+			};
+			buildConfigurationList = F719068F2C9CC444008D50F6 /* Build configuration list for PBXProject "Lolgato" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = F719068B2C9CC444008D50F6;
+			productRefGroup = F71906952C9CC444008D50F6 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F71906932C9CC444008D50F6 /* Lolgato */,
+				F71906A42C9CC44F008D50F6 /* LolgatoTests */,
+				F71906AE2C9CC44F008D50F6 /* LolgatoUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		F71906922C9CC444008D50F6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F719069F2C9CC44E008D50F6 /* Preview Assets.xcassets in Resources */,
+				F719069C2C9CC44E008D50F6 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F71906A32C9CC44F008D50F6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F71906AD2C9CC44F008D50F6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		F71906902C9CC444008D50F6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F71906CA2C9DC467008D50F6 /* ElgatoDiscovery.swift in Sources */,
+				F71906C32C9CC51C008D50F6 /* AppDelegate.swift in Sources */,
+				F71906982C9CC444008D50F6 /* LolgatoApp.swift in Sources */,
+				F71906C82C9DC13B008D50F6 /* ElgatoDeviceManager.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F71906A12C9CC44F008D50F6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F71906AA2C9CC44F008D50F6 /* LolgatoTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F71906AB2C9CC44F008D50F6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F71906B42C9CC44F008D50F6 /* LolgatoUITests.swift in Sources */,
+				F71906B62C9CC44F008D50F6 /* LolgatoUITestsLaunchTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		F71906A72C9CC44F008D50F6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F71906932C9CC444008D50F6 /* Lolgato */;
+			targetProxy = F71906A62C9CC44F008D50F6 /* PBXContainerItemProxy */;
+		};
+		F71906B12C9CC44F008D50F6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F71906932C9CC444008D50F6 /* Lolgato */;
+			targetProxy = F71906B02C9CC44F008D50F6 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		F71906B72C9CC44F008D50F6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.2;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		F71906B82C9CC44F008D50F6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		F71906BA2C9CC44F008D50F6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Lolgato/Lolgato.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Lolgato/Preview Content\"";
+				DEVELOPMENT_TEAM = 8KC85QU7L4;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Lolgato/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = fi.zendit.Lolgato;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		F71906BB2C9CC44F008D50F6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Lolgato/Lolgato.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Lolgato/Preview Content\"";
+				DEVELOPMENT_TEAM = 8KC85QU7L4;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Lolgato/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = fi.zendit.Lolgato;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		F71906BD2C9CC44F008D50F6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8KC85QU7L4;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = fi.zendit.LolgatoTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Lolgato.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Lolgato";
+			};
+			name = Debug;
+		};
+		F71906BE2C9CC44F008D50F6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8KC85QU7L4;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = fi.zendit.LolgatoTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Lolgato.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Lolgato";
+			};
+			name = Release;
+		};
+		F71906C02C9CC44F008D50F6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8KC85QU7L4;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = fi.zendit.LolgatoUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = Lolgato;
+			};
+			name = Debug;
+		};
+		F71906C12C9CC44F008D50F6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8KC85QU7L4;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = fi.zendit.LolgatoUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = Lolgato;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		F719068F2C9CC444008D50F6 /* Build configuration list for PBXProject "Lolgato" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F71906B72C9CC44F008D50F6 /* Debug */,
+				F71906B82C9CC44F008D50F6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F71906B92C9CC44F008D50F6 /* Build configuration list for PBXNativeTarget "Lolgato" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F71906BA2C9CC44F008D50F6 /* Debug */,
+				F71906BB2C9CC44F008D50F6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F71906BC2C9CC44F008D50F6 /* Build configuration list for PBXNativeTarget "LolgatoTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F71906BD2C9CC44F008D50F6 /* Debug */,
+				F71906BE2C9CC44F008D50F6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F71906BF2C9CC44F008D50F6 /* Build configuration list for PBXNativeTarget "LolgatoUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F71906C02C9CC44F008D50F6 /* Debug */,
+				F71906C12C9CC44F008D50F6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = F719068C2C9CC444008D50F6 /* Project object */;
+}
