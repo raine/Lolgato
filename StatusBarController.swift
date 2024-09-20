@@ -6,15 +6,23 @@ class StatusBarController: ObservableObject {
     private var statusItem: NSStatusItem
     private var cancellables: Set<AnyCancellable> = []
     @ObservedObject var deviceManager: ElgatoDeviceManager
+
     @Published var lightsOnWithCamera: Bool {
         didSet {
             UserDefaults.standard.set(lightsOnWithCamera, forKey: "lightsOnWithCamera")
         }
     }
 
+    @Published var lightsOffOnSleep: Bool {
+        didSet {
+            UserDefaults.standard.set(lightsOffOnSleep, forKey: "lightsOffOnSleep")
+        }
+    }
+
     init(deviceManager: ElgatoDeviceManager) {
         self.deviceManager = deviceManager
         lightsOnWithCamera = UserDefaults.standard.bool(forKey: "lightsOnWithCamera")
+        lightsOffOnSleep = UserDefaults.standard.bool(forKey: "lightsOffOnSleep")
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         if let button = statusItem.button {
             button.image = NSImage(systemSymbolName: "lightbulb", accessibilityDescription: "Elgato Devices")
@@ -33,13 +41,11 @@ class StatusBarController: ObservableObject {
         titleItem.attributedTitle = NSAttributedString(string: "Devices:", attributes: titleAttributes)
         titleItem.isEnabled = false
         menu.addItem(titleItem)
-
         deviceManager.objectWillChange
             .sink { [weak self] in
                 self?.updateMenu()
             }
             .store(in: &cancellables)
-
         updateMenu()
         statusItem.menu = menu
     }
@@ -50,7 +56,6 @@ class StatusBarController: ObservableObject {
         while menu.items.count > 1 {
             menu.removeItem(at: 1)
         }
-
         if deviceManager.devices.isEmpty {
             let noDevicesItem = NSMenuItem(title: "No devices found", action: nil, keyEquivalent: "")
             noDevicesItem.isEnabled = false
@@ -69,7 +74,6 @@ class StatusBarController: ObservableObject {
                 menu.addItem(menuItem)
             }
         }
-
         menu.addItem(NSMenuItem.separator())
 
         // Add the toggle for lights with camera
@@ -82,12 +86,20 @@ class StatusBarController: ObservableObject {
         lightsToggleItem.state = lightsOnWithCamera ? .on : .off
         menu.addItem(lightsToggleItem)
 
-        menu.addItem(NSMenuItem.separator())
+        // Add the toggle for lights off on sleep
+        let sleepToggleItem = NSMenuItem(
+            title: "Lights off on Sleep",
+            action: #selector(toggleLightsOffOnSleep),
+            keyEquivalent: ""
+        )
+        sleepToggleItem.target = self
+        sleepToggleItem.state = lightsOffOnSleep ? .on : .off
+        menu.addItem(sleepToggleItem)
 
+        menu.addItem(NSMenuItem.separator())
         let refreshItem = NSMenuItem(title: "Refresh", action: #selector(refreshDevices), keyEquivalent: "r")
         refreshItem.target = self
         menu.addItem(refreshItem)
-
         let quitItem = NSMenuItem(
             title: "Quit",
             action: #selector(NSApplication.shared.terminate(_:)),
@@ -104,6 +116,11 @@ class StatusBarController: ObservableObject {
 
     @objc private func toggleLightsWithCamera() {
         lightsOnWithCamera.toggle()
+        updateMenu()
+    }
+
+    @objc private func toggleLightsOffOnSleep() {
+        lightsOffOnSleep.toggle()
         updateMenu()
     }
 }
