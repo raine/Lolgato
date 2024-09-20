@@ -1,17 +1,23 @@
 import Cocoa
-import Network
-import os
+import SwiftUI
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     private var deviceManager: ElgatoDeviceManager?
+    private var statusBarController: StatusBarController?
 
     func applicationDidFinishLaunching(_: Notification) {
         let discovery = ElgatoDiscovery()
         deviceManager = ElgatoDeviceManager(discovery: discovery)
+
+        if let deviceManager = deviceManager {
+            statusBarController = StatusBarController(deviceManager: deviceManager)
+        }
     }
 
     func applicationWillBecomeActive(_: Notification) {
-        deviceManager?.performDiscovery()
+        Task {
+            await deviceManager?.performDiscovery()
+        }
     }
 
     func applicationWillTerminate(_: Notification) {

@@ -16,6 +16,7 @@
 		F71906C32C9CC51C008D50F6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F71906C22C9CC51C008D50F6 /* AppDelegate.swift */; };
 		F71906C82C9DC13B008D50F6 /* ElgatoDeviceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F71906C72C9DC13B008D50F6 /* ElgatoDeviceManager.swift */; };
 		F71906CA2C9DC467008D50F6 /* ElgatoDiscovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = F71906C92C9DC467008D50F6 /* ElgatoDiscovery.swift */; };
+		F71906CC2C9DD0EA008D50F6 /* StatusBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F71906CB2C9DD0EA008D50F6 /* StatusBarController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -50,6 +51,7 @@
 		F71906C42C9CC74E008D50F6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		F71906C72C9DC13B008D50F6 /* ElgatoDeviceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElgatoDeviceManager.swift; sourceTree = "<group>"; };
 		F71906C92C9DC467008D50F6 /* ElgatoDiscovery.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ElgatoDiscovery.swift; sourceTree = "<group>"; };
+		F71906CB2C9DD0EA008D50F6 /* StatusBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarController.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -100,6 +102,7 @@
 		F71906962C9CC444008D50F6 /* Lolgato */ = {
 			isa = PBXGroup;
 			children = (
+				F71906CB2C9DD0EA008D50F6 /* StatusBarController.swift */,
 				F71906C92C9DC467008D50F6 /* ElgatoDiscovery.swift */,
 				F71906C42C9CC74E008D50F6 /* Info.plist */,
 				F71906972C9CC444008D50F6 /* LolgatoApp.swift */,
@@ -270,6 +273,7 @@
 				F71906CA2C9DC467008D50F6 /* ElgatoDiscovery.swift in Sources */,
 				F71906C32C9CC51C008D50F6 /* AppDelegate.swift in Sources */,
 				F71906982C9CC444008D50F6 /* LolgatoApp.swift in Sources */,
+				F71906CC2C9DD0EA008D50F6 /* StatusBarController.swift in Sources */,
 				F71906C82C9DC13B008D50F6 /* ElgatoDeviceManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
