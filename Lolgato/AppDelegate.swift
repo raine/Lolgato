@@ -8,15 +8,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_: Notification) {
         let discovery = ElgatoDiscovery()
         deviceManager = ElgatoDeviceManager(discovery: discovery)
-
         if let deviceManager = deviceManager {
             statusBarController = StatusBarController(deviceManager: deviceManager)
-        }
-    }
-
-    func applicationWillBecomeActive(_: Notification) {
-        Task {
-            await deviceManager?.performDiscovery()
+            deviceManager.startDiscovery()
         }
     }
 

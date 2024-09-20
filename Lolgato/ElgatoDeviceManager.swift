@@ -1,3 +1,4 @@
+import Combine
 import Foundation
 import Network
 import os
@@ -110,64 +111,100 @@ class ElgatoDeviceManager: ObservableObject {
     @Published private(set) var devices: [ElgatoDevice] = []
     private let discovery: ElgatoDiscovery
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "ElgatoDeviceManager")
+    private var discoveryTask: Task<Void, Never>?
 
     init(discovery: ElgatoDiscovery) {
         self.discovery = discovery
     }
 
-    func performDiscovery() async {
-        let results = await discovery.startDiscovery()
-        await updateDevices(with: results)
-    }
+    func startDiscovery() {
+        guard discoveryTask == nil else {
+            logger.info("Discovery is already running")
+            return
+        }
 
-    @MainActor
-    private func updateDevices(with results: [NWEndpoint]) {
-        let currentDate = Date()
-
-        // Update existing devices and add new ones
-        for endpoint in results {
-            if let existingDevice = devices.first(where: { $0.endpoint == endpoint }) {
-                existingDevice.isOnline = true
-                existingDevice.lastSeen = currentDate
-            } else {
-                let newDevice = ElgatoDevice(endpoint: endpoint)
-                newDevice.lastSeen = currentDate
-
-                logger.info("New device found: \(endpoint.debugDescription)")
-                devices.append(newDevice)
-
-                // Fetch accessory info for new device
-                Task {
-                    do {
-                        try await newDevice.fetchAccessoryInfo()
-                        logger
-                            .info(
-                                "Accessory info fetched for device: \(newDevice.displayName ?? newDevice.productName)"
-                            )
-                    } catch {
-                        logger
-                            .error(
-                                "Failed to fetch accessory info for device: \(endpoint.debugDescription), error: \(error.localizedDescription)"
-                            )
-                    }
-                    self.objectWillChange.send()
+        discoveryTask = Task {
+            do {
+                for try await event in discovery {
+                    await handleDiscoveryEvent(event)
                 }
+            } catch {
+                logger.error("Discovery stream ended with error: \(error.localizedDescription)")
             }
+            logger.info("Discovery stream ended")
+            self.discoveryTask = nil
         }
-
-        // Mark devices as offline if not seen in this discovery round
-        for device in devices where device.lastSeen != currentDate {
-            device.isOnline = false
-        }
-
-        // Remove devices not seen for a long time (e.g., 24 hours)
-        let removalThreshold = currentDate.addingTimeInterval(-24 * 60 * 60)
-        devices.removeAll { $0.lastSeen < removalThreshold }
-
-        objectWillChange.send()
     }
 
     func stopDiscovery() {
+        discoveryTask?.cancel()
+        discoveryTask = nil
         discovery.stopDiscovery()
+    }
+
+    @MainActor
+    private func handleDiscoveryEvent(_ event: ElgatoDiscoveryEvent) {
+        logger.info("Discovery event: \(event.debugDescription)")
+
+        switch event {
+        case let .deviceFound(endpoint):
+            addOrUpdateDevice(for: endpoint)
+        case let .deviceLost(endpoint):
+            markDeviceOffline(for: endpoint)
+        case let .error(error):
+            logger.error("Discovery error: \(error.localizedDescription)")
+        }
+    }
+
+    @MainActor
+    private func addOrUpdateDevice(for endpoint: NWEndpoint) {
+        if let existingDevice = devices.first(where: { $0.endpoint == endpoint }) {
+            existingDevice.isOnline = true
+            existingDevice.lastSeen = Date()
+        } else {
+            let newDevice = ElgatoDevice(endpoint: endpoint)
+            newDevice.lastSeen = Date()
+
+            logger.info("New device found: \(endpoint.debugDescription)")
+            devices.append(newDevice)
+
+            Task {
+                await fetchAccessoryInfo(for: newDevice)
+            }
+        }
+        objectWillChange.send()
+    }
+
+    @MainActor
+    private func markDeviceOffline(for endpoint: NWEndpoint) {
+        if let device = devices.first(where: { $0.endpoint == endpoint }) {
+            device.isOnline = false
+            logger.info("Device went offline: \(endpoint.debugDescription)")
+            objectWillChange.send()
+        }
+    }
+
+    private func fetchAccessoryInfo(for device: ElgatoDevice) async {
+        do {
+            try await device.fetchAccessoryInfo()
+            await MainActor.run {
+                logger.info("Accessory info fetched for device: \(device.displayName ?? device.productName)")
+                self.objectWillChange.send()
+            }
+        } catch {
+            await MainActor.run {
+                logger
+                    .error(
+                        "Failed to fetch accessory info for device: \(device.endpoint.debugDescription), error: \(error.localizedDescription)"
+                    )
+            }
+        }
+    }
+
+    @MainActor
+    func removeStaleDevices() {
+        let removalThreshold = Date().addingTimeInterval(-24 * 60 * 60)
+        devices.removeAll { $0.lastSeen < removalThreshold }
+        objectWillChange.send()
     }
 }
