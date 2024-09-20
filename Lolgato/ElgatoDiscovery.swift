@@ -87,7 +87,7 @@ class ElgatoDiscovery: AsyncSequence {
                 case .identical:
                     // No action needed for identical results
                     break
-                case let .changed(old: old, new: new, flags: flags):
+                case let .changed(old: old, new: new, flags: _):
                     if self.discoveredEndpoints.contains(old.endpoint) {
                         self.discoveredEndpoints.remove(old.endpoint)
                         self.discoveredEndpoints.insert(new.endpoint)
