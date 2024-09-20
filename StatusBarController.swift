@@ -97,21 +97,13 @@ class StatusBarController: ObservableObject {
         menu.addItem(sleepToggleItem)
 
         menu.addItem(NSMenuItem.separator())
-        let refreshItem = NSMenuItem(title: "Refresh", action: #selector(refreshDevices), keyEquivalent: "r")
-        refreshItem.target = self
-        menu.addItem(refreshItem)
+
         let quitItem = NSMenuItem(
             title: "Quit",
             action: #selector(NSApplication.shared.terminate(_:)),
             keyEquivalent: "q"
         )
         menu.addItem(quitItem)
-    }
-
-    @objc private func refreshDevices() {
-        Task {
-            await deviceManager.performDiscovery()
-        }
     }
 
     @objc private func toggleLightsWithCamera() {
