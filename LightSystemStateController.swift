@@ -93,12 +93,12 @@ class LightSystemStateController {
                     try await device.turnOff()
                     logger
                         .info(
-                            "Turned off device: \(device.displayName ?? device.productName) due to \(reason)"
+                            "Turned off device: \(device.name) due to \(reason)"
                         )
                 } catch {
                     logger
                         .error(
-                            "Failed to turn off device: \(device.displayName ?? device.productName) due to \(reason). Error: \(error.localizedDescription)"
+                            "Failed to turn off device: \(device.name) due to \(reason). Error: \(error.localizedDescription)"
                         )
                 }
             }

@@ -47,11 +47,11 @@ class LightCameraController {
             Task {
                 do {
                     try await device.turnOn()
-                    logger.info("Turned on device: \(device.displayName ?? device.productName)")
+                    logger.info("Turned on device: \(device.name)")
                 } catch {
                     logger
                         .error(
-                            "Failed to turn on device: \(device.displayName ?? device.productName). Error: \(error.localizedDescription)"
+                            "Failed to turn on device: \(device.name). Error: \(error.localizedDescription)"
                         )
                 }
             }
@@ -66,11 +66,11 @@ class LightCameraController {
             Task {
                 do {
                     try await device.turnOff()
-                    logger.info("Turned off device: \(device.displayName ?? device.productName)")
+                    logger.info("Turned off device: \(device.name)")
                 } catch {
                     logger
                         .error(
-                            "Failed to turn off device: \(device.displayName ?? device.productName). Error: \(error.localizedDescription)"
+                            "Failed to turn off device: \(device.name). Error: \(error.localizedDescription)"
                         )
                 }
             }

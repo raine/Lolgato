@@ -27,6 +27,8 @@ class ElgatoDevice: Identifiable, Equatable {
 
     var id: NWEndpoint { endpoint }
 
+    var name: String { displayName ?? productName }
+
     init(endpoint: NWEndpoint) {
         self.endpoint = endpoint
         productName = ""
