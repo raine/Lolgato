@@ -12,13 +12,14 @@ class LightSystemStateController {
         category: "LightSystemStateController"
     )
     private var screenLockMonitor: Any?
+    private var screenUnlockMonitor: Any?
+    private var didTurnOffLights: Bool = false
 
     init(deviceManager: ElgatoDeviceManager, appDelegate: AppDelegate) {
         self.deviceManager = deviceManager
         self.appDelegate = appDelegate
         setupSubscriptions()
         setupNotificationObservers()
-        setupScreenLockMonitor()
     }
 
     private func setupSubscriptions() {
@@ -42,9 +43,7 @@ class LightSystemStateController {
             name: NSWorkspace.screensDidSleepNotification,
             object: nil
         )
-    }
 
-    private func setupScreenLockMonitor() {
         let distributed = DistributedNotificationCenter.default()
         screenLockMonitor = distributed.addObserver(
             forName: .init("com.apple.screenIsLocked"),
@@ -53,11 +52,21 @@ class LightSystemStateController {
         ) { [weak self] _ in
             self?.handleScreenLock()
         }
+        screenUnlockMonitor = distributed.addObserver(
+            forName: .init("com.apple.screenIsUnlocked"),
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.handleScreenUnlock()
+        }
     }
 
     deinit {
         if let screenLockMonitor = screenLockMonitor {
             DistributedNotificationCenter.default().removeObserver(screenLockMonitor)
+        }
+        if let screenUnlockMonitor = screenUnlockMonitor {
+            DistributedNotificationCenter.default().removeObserver(screenUnlockMonitor)
         }
     }
 
@@ -86,6 +95,12 @@ class LightSystemStateController {
         turnOffAllLights(reason: "screen lock")
     }
 
+    private func handleScreenUnlock() {
+        guard didTurnOffLights else { return }
+        logger.info("Screen unlocked. Turning on lights.")
+        turnOnAllLights(reason: "screen unlock")
+    }
+
     private func turnOffAllLights(reason: String) {
         for device in deviceManager.devices where device.isOnline {
             Task {
@@ -95,10 +110,31 @@ class LightSystemStateController {
                         .info(
                             "Turned off device: \(device.displayName ?? device.productName) due to \(reason)"
                         )
+                    didTurnOffLights = true
                 } catch {
                     logger
                         .error(
                             "Failed to turn off device: \(device.displayName ?? device.productName) due to \(reason). Error: \(error.localizedDescription)"
+                        )
+                }
+            }
+        }
+    }
+
+    private func turnOnAllLights(reason: String) {
+        for device in deviceManager.devices where device.isOnline {
+            Task {
+                do {
+                    try await device.turnOn()
+                    logger
+                        .info(
+                            "Turned on device: \(device.displayName ?? device.productName) due to \(reason)"
+                        )
+                    didTurnOffLights = false
+                } catch {
+                    logger
+                        .error(
+                            "Failed to turn on device: \(device.displayName ?? device.productName) due to \(reason). Error: \(error.localizedDescription)"
                         )
                 }
             }
