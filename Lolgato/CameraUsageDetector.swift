@@ -45,7 +45,7 @@ class CameraUsageDetector {
 
         do {
             let isActive = try isCameraOn()
-            if isActive != lastActiveState {
+            if isActive != lastActiveState, lastActiveState != nil {
                 lastActiveState = isActive
                 callback?(isActive)
             }
