@@ -6,6 +6,7 @@ class CameraUsageDetector {
     private var timer: Timer?
     private var callback: ((Bool) -> Void)?
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "CameraUsageDetector")
+    private var lastActiveState: Bool?
 
     enum CameraError: Error {
         case failedToGetDevices(OSStatus)
@@ -23,15 +24,22 @@ class CameraUsageDetector {
     func stopMonitoring() {
         timer?.invalidate()
         timer = nil
+        lastActiveState = nil
     }
 
     private func checkCameraStatus() {
         do {
             let isActive = try isCameraOn()
-            callback?(isActive)
+            if isActive != lastActiveState {
+                lastActiveState = isActive
+                callback?(isActive)
+            }
         } catch {
             logger.error("Error checking camera status: \(error.localizedDescription)")
-            callback?(false)
+            if lastActiveState != false {
+                lastActiveState = false
+                callback?(false)
+            }
         }
     }
 
@@ -41,10 +49,8 @@ class CameraUsageDetector {
             mScope: CMIOObjectPropertyScope(kCMIOObjectPropertyScopeGlobal),
             mElement: CMIOObjectPropertyElement(kCMIOObjectPropertyElementMain)
         )
-
         var dataSize: UInt32 = 0
         var dataUsed: UInt32 = 0
-
         var result = CMIOObjectGetPropertyDataSize(
             CMIOObjectID(kCMIOObjectSystemObject),
             &propertyAddress,
@@ -57,13 +63,11 @@ class CameraUsageDetector {
         }
 
         let deviceCount = Int(dataSize) / MemoryLayout<CMIODeviceID>.size
-
         guard deviceCount > 0 else {
             throw CameraError.noDevicesFound
         }
 
         var devices = [CMIODeviceID](repeating: 0, count: deviceCount)
-
         result = CMIOObjectGetPropertyData(
             CMIOObjectID(kCMIOObjectSystemObject),
             &propertyAddress,
@@ -78,8 +82,7 @@ class CameraUsageDetector {
         }
 
         var failedDeviceCount = 0
-
-        for (index, device) in devices.enumerated() {
+        for device in devices {
             if let isUsed = isDeviceInUse(device) {
                 if isUsed {
                     return true
@@ -102,13 +105,10 @@ class CameraUsageDetector {
             mScope: CMIOObjectPropertyScope(kCMIOObjectPropertyScopeWildcard),
             mElement: CMIOObjectPropertyElement(kCMIOObjectPropertyElementWildcard)
         )
-
         var isUsed: UInt32 = 0
         var dataSize = UInt32(MemoryLayout<UInt32>.size)
         var dataUsed: UInt32 = 0
-
         let result = CMIOObjectGetPropertyData(device, &propertyAddress, 0, nil, dataSize, &dataUsed, &isUsed)
-
         if result == kCMIOHardwareNoError {
             return isUsed != 0
         } else {
