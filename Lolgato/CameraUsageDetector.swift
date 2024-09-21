@@ -1,9 +1,11 @@
 import AVFoundation
 import CoreMediaIO
+import os
 
 class CameraUsageDetector {
     private var timer: Timer?
     private var callback: ((Bool) -> Void)?
+    private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "CameraUsageDetector")
 
     enum CameraError: Error {
         case failedToGetDevices(OSStatus)
@@ -28,7 +30,7 @@ class CameraUsageDetector {
             let isActive = try isCameraOn()
             callback?(isActive)
         } catch {
-            print("Error checking camera status: \(error)")
+            logger.error("Error checking camera status: \(error.localizedDescription)")
             callback?(false)
         }
     }
@@ -55,7 +57,6 @@ class CameraUsageDetector {
         }
 
         let deviceCount = Int(dataSize) / MemoryLayout<CMIODeviceID>.size
-        print("Number of devices found: \(deviceCount)")
 
         guard deviceCount > 0 else {
             throw CameraError.noDevicesFound
@@ -79,10 +80,8 @@ class CameraUsageDetector {
         var failedDeviceCount = 0
 
         for (index, device) in devices.enumerated() {
-            print("Checking device \(index + 1) of \(deviceCount)")
             if let isUsed = isDeviceInUse(device) {
                 if isUsed {
-                    print("Device \(index + 1) is in use")
                     return true
                 }
             } else {
@@ -94,7 +93,6 @@ class CameraUsageDetector {
             throw CameraError.allDevicesFailed
         }
 
-        print("No devices are currently in use")
         return false
     }
 
@@ -114,7 +112,7 @@ class CameraUsageDetector {
         if result == kCMIOHardwareNoError {
             return isUsed != 0
         } else {
-            print("Failed to get device usage status: \(result)")
+            logger.error("Failed to get device usage status: \(result)")
             return nil
         }
     }
