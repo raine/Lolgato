@@ -18,6 +18,7 @@
 		F71906CA2C9DC467008D50F6 /* ElgatoDiscovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = F71906C92C9DC467008D50F6 /* ElgatoDiscovery.swift */; };
 		F71906CC2C9DD0EA008D50F6 /* StatusBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F71906CB2C9DD0EA008D50F6 /* StatusBarController.swift */; };
 		F71906CE2C9E3177008D50F6 /* CameraUsageDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = F71906CD2C9E3177008D50F6 /* CameraUsageDetector.swift */; };
+		F71906D02C9EDF86008D50F6 /* LightCameraController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F71906CF2C9EDF86008D50F6 /* LightCameraController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -54,6 +55,7 @@
 		F71906C92C9DC467008D50F6 /* ElgatoDiscovery.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ElgatoDiscovery.swift; sourceTree = "<group>"; };
 		F71906CB2C9DD0EA008D50F6 /* StatusBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarController.swift; sourceTree = SOURCE_ROOT; };
 		F71906CD2C9E3177008D50F6 /* CameraUsageDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraUsageDetector.swift; sourceTree = "<group>"; };
+		F71906CF2C9EDF86008D50F6 /* LightCameraController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightCameraController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,6 +86,7 @@
 		F719068B2C9CC444008D50F6 = {
 			isa = PBXGroup;
 			children = (
+				F71906CF2C9EDF86008D50F6 /* LightCameraController.swift */,
 				F71906962C9CC444008D50F6 /* Lolgato */,
 				F71906A82C9CC44F008D50F6 /* LolgatoTests */,
 				F71906B22C9CC44F008D50F6 /* LolgatoUITests */,
@@ -278,6 +281,7 @@
 				F71906CE2C9E3177008D50F6 /* CameraUsageDetector.swift in Sources */,
 				F71906982C9CC444008D50F6 /* LolgatoApp.swift in Sources */,
 				F71906CC2C9DD0EA008D50F6 /* StatusBarController.swift in Sources */,
+				F71906D02C9EDF86008D50F6 /* LightCameraController.swift in Sources */,
 				F71906C82C9DC13B008D50F6 /* ElgatoDeviceManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

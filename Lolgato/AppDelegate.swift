@@ -1,19 +1,42 @@
 import Cocoa
+import Combine
 import SwiftUI
 
-class AppDelegate: NSObject, NSApplicationDelegate {
+class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
     private var deviceManager: ElgatoDeviceManager?
     private var statusBarController: StatusBarController?
     private var cameraDetector: CameraUsageDetector?
+    private var lightCameraController: LightCameraController?
+
+    @Published var lightsOnWithCamera: Bool {
+        didSet {
+            UserDefaults.standard.set(lightsOnWithCamera, forKey: "lightsOnWithCamera")
+        }
+    }
+
+    @Published var lightsOffOnSleep: Bool {
+        didSet {
+            UserDefaults.standard.set(lightsOffOnSleep, forKey: "lightsOffOnSleep")
+        }
+    }
+
+    override init() {
+        lightsOnWithCamera = UserDefaults.standard.bool(forKey: "lightsOnWithCamera")
+        lightsOffOnSleep = UserDefaults.standard.bool(forKey: "lightsOffOnSleep")
+        super.init()
+    }
 
     func applicationDidFinishLaunching(_: Notification) {
         let discovery = ElgatoDiscovery()
         deviceManager = ElgatoDeviceManager(discovery: discovery)
         if let deviceManager = deviceManager {
-            statusBarController = StatusBarController(deviceManager: deviceManager)
+            statusBarController = StatusBarController(deviceManager: deviceManager, appDelegate: self)
+            lightCameraController = LightCameraController(
+                deviceManager: deviceManager,
+                appDelegate: self
+            )
             deviceManager.startDiscovery()
         }
-
         setupCameraMonitoring()
     }
 
@@ -25,15 +48,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private func setupCameraMonitoring() {
         cameraDetector = CameraUsageDetector()
         cameraDetector?.startMonitoring { [weak self] isActive in
-            self?.handleCameraActivityChange(isActive: isActive)
-        }
-    }
-
-    private func handleCameraActivityChange(isActive: Bool) {
-        if isActive {
-            print("Camera became active")
-        } else {
-            print("Camera became inactive")
+            self?.lightCameraController?.handleCameraActivityChange(isActive: isActive)
         }
     }
 }

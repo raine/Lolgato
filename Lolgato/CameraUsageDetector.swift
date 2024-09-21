@@ -106,7 +106,7 @@ class CameraUsageDetector {
             mElement: CMIOObjectPropertyElement(kCMIOObjectPropertyElementWildcard)
         )
         var isUsed: UInt32 = 0
-        var dataSize = UInt32(MemoryLayout<UInt32>.size)
+        let dataSize = UInt32(MemoryLayout<UInt32>.size)
         var dataUsed: UInt32 = 0
         let result = CMIOObjectGetPropertyData(device, &propertyAddress, 0, nil, dataSize, &dataUsed, &isUsed)
         if result == kCMIOHardwareNoError {

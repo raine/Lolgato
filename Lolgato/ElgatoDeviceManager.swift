@@ -105,6 +105,57 @@ class ElgatoDevice: Identifiable, Equatable {
             throw FetchError.networkError(error)
         }
     }
+
+    enum LightControlError: Error {
+        case invalidEndpoint
+        case networkError(Error)
+        case invalidResponse
+    }
+
+    func turnOn() async throws {
+        try await setLightState(on: true)
+    }
+
+    func turnOff() async throws {
+        try await setLightState(on: false)
+    }
+
+    private func setLightState(on: Bool) async throws {
+        guard case let .hostPort(host, port) = endpoint else {
+            throw LightControlError.invalidEndpoint
+        }
+
+        let cleanHost = host.debugDescription.split(separator: "%").first.map(String.init) ?? host
+            .debugDescription
+        let urlString = "http://\(cleanHost):\(port)/elgato/lights"
+        guard let url = URL(string: urlString) else {
+            throw LightControlError.invalidEndpoint
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "PUT"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        let data = ["numberOfLights": 1, "lights": [["on": on ? 1 : 0]]] as [String: Any]
+        request.httpBody = try JSONSerialization.data(withJSONObject: data)
+
+        do {
+            let (responseData, _) = try await URLSession.shared.data(for: request)
+            let json = try JSONSerialization.jsonObject(with: responseData, options: []) as? [String: Any]
+
+            guard let lights = json?["lights"] as? [[String: Any]],
+                  let firstLight = lights.first,
+                  let _ = firstLight["on"] as? Int
+            else {
+                throw LightControlError.invalidResponse
+            }
+
+            // Update the local state
+//            self.isOn = (isOn == 1)
+        } catch {
+            throw LightControlError.networkError(error)
+        }
+    }
 }
 
 class ElgatoDeviceManager: ObservableObject {
@@ -112,6 +163,7 @@ class ElgatoDeviceManager: ObservableObject {
     private let discovery: ElgatoDiscovery
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "ElgatoDeviceManager")
     private var discoveryTask: Task<Void, Never>?
+    let newDeviceDiscovered = PassthroughSubject<ElgatoDevice, Never>()
 
     init(discovery: ElgatoDiscovery) {
         self.discovery = discovery
@@ -167,6 +219,8 @@ class ElgatoDeviceManager: ObservableObject {
 
             logger.info("New device found: \(endpoint.debugDescription)")
             devices.append(newDevice)
+
+            newDeviceDiscovered.send(newDevice)
 
             Task {
                 await fetchAccessoryInfo(for: newDevice)

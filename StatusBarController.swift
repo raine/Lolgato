@@ -6,23 +6,11 @@ class StatusBarController: ObservableObject {
     private var statusItem: NSStatusItem
     private var cancellables: Set<AnyCancellable> = []
     @ObservedObject var deviceManager: ElgatoDeviceManager
+    @ObservedObject var appDelegate: AppDelegate
 
-    @Published var lightsOnWithCamera: Bool {
-        didSet {
-            UserDefaults.standard.set(lightsOnWithCamera, forKey: "lightsOnWithCamera")
-        }
-    }
-
-    @Published var lightsOffOnSleep: Bool {
-        didSet {
-            UserDefaults.standard.set(lightsOffOnSleep, forKey: "lightsOffOnSleep")
-        }
-    }
-
-    init(deviceManager: ElgatoDeviceManager) {
+    init(deviceManager: ElgatoDeviceManager, appDelegate: AppDelegate) {
         self.deviceManager = deviceManager
-        lightsOnWithCamera = UserDefaults.standard.bool(forKey: "lightsOnWithCamera")
-        lightsOffOnSleep = UserDefaults.standard.bool(forKey: "lightsOffOnSleep")
+        self.appDelegate = appDelegate
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         if let button = statusItem.button {
             button.image = NSImage(systemSymbolName: "lightbulb", accessibilityDescription: "Elgato Devices")
@@ -83,7 +71,7 @@ class StatusBarController: ObservableObject {
             keyEquivalent: ""
         )
         lightsToggleItem.target = self
-        lightsToggleItem.state = lightsOnWithCamera ? .on : .off
+        lightsToggleItem.state = appDelegate.lightsOnWithCamera ? .on : .off
         menu.addItem(lightsToggleItem)
 
         // Add the toggle for lights off on sleep
@@ -93,7 +81,7 @@ class StatusBarController: ObservableObject {
             keyEquivalent: ""
         )
         sleepToggleItem.target = self
-        sleepToggleItem.state = lightsOffOnSleep ? .on : .off
+        sleepToggleItem.state = appDelegate.lightsOffOnSleep ? .on : .off
         menu.addItem(sleepToggleItem)
 
         menu.addItem(NSMenuItem.separator())
@@ -107,12 +95,12 @@ class StatusBarController: ObservableObject {
     }
 
     @objc private func toggleLightsWithCamera() {
-        lightsOnWithCamera.toggle()
+        appDelegate.lightsOnWithCamera.toggle()
         updateMenu()
     }
 
     @objc private func toggleLightsOffOnSleep() {
-        lightsOffOnSleep.toggle()
+        appDelegate.lightsOffOnSleep.toggle()
         updateMenu()
     }
 }
