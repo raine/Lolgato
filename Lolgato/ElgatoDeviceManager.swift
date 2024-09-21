@@ -9,10 +9,13 @@ struct WifiInfo: Codable {
     let rssi: Int
 }
 
-class ElgatoDevice: Identifiable, Equatable {
+class ElgatoDevice: Identifiable, Equatable, Hashable {
+    private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "ElgatoDevice")
+
     let endpoint: NWEndpoint
     var isOnline: Bool = true
     var lastSeen: Date = .init()
+    var isOn: Bool = false
 
     var productName: String
     var hardwareBoardType: Int
@@ -46,12 +49,56 @@ class ElgatoDevice: Identifiable, Equatable {
         lhs.endpoint == rhs.endpoint
     }
 
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(endpoint)
+    }
+
     enum FetchError: Error {
         case invalidEndpoint
         case invalidURL
         case networkError(Error)
         case invalidResponse
         case missingRequiredField(String)
+    }
+
+    func fetchLightInfo() async throws {
+        struct LightResponse: Codable {
+            let numberOfLights: Int
+            let lights: [LightStatus]
+        }
+
+        struct LightStatus: Codable {
+            let on: Int
+            let brightness: Int
+            let temperature: Int
+        }
+
+        guard case let .hostPort(host, port) = endpoint else {
+            throw FetchError.invalidEndpoint
+        }
+
+        let cleanHost = host.debugDescription.split(separator: "%").first.map(String.init) ?? host
+            .debugDescription
+        let urlString = "http://\(cleanHost):\(port)/elgato/lights"
+        guard let url = URL(string: urlString) else {
+            throw FetchError.invalidURL
+        }
+
+        do {
+            logger.info("GET \(url)")
+            let (data, _) = try await URLSession.shared.data(from: url)
+            let json = try JSONDecoder().decode(LightResponse.self, from: data)
+
+            guard let lightStatus = json.lights.first else {
+                throw FetchError.invalidResponse
+            }
+
+            isOn = lightStatus.on == 1
+        } catch _ as DecodingError {
+            throw FetchError.invalidResponse
+        } catch {
+            throw FetchError.networkError(error)
+        }
     }
 
     func fetchAccessoryInfo() async throws {
@@ -67,6 +114,7 @@ class ElgatoDevice: Identifiable, Equatable {
         }
 
         do {
+            logger.info("GET \(url)")
             let (data, _) = try await URLSession.shared.data(from: url)
             let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
 
@@ -147,13 +195,12 @@ class ElgatoDevice: Identifiable, Equatable {
 
             guard let lights = json?["lights"] as? [[String: Any]],
                   let firstLight = lights.first,
-                  let _ = firstLight["on"] as? Int
+                  let isOn = firstLight["on"] as? Int
             else {
                 throw LightControlError.invalidResponse
             }
 
-            // Update the local state
-//            self.isOn = (isOn == 1)
+            self.isOn = (isOn == 1)
         } catch {
             throw LightControlError.networkError(error)
         }

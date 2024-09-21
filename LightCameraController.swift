@@ -6,7 +6,7 @@ class LightCameraController {
     private let deviceManager: ElgatoDeviceManager
     private let appDelegate: AppDelegate
     private var cancellables: Set<AnyCancellable> = []
-    private var areLightsControlledByCamera: Bool = false
+    private var lightsControlledByCamera: Set<ElgatoDevice> = []
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "LightCameraController")
     private var isCameraActive: Bool = false
 
@@ -28,7 +28,7 @@ class LightCameraController {
         if newValue, isCameraActive {
             turnOnAllLights()
         } else if !newValue {
-            turnOffLightsIfControlled()
+            turnOffControlledLights()
         }
     }
 
@@ -36,10 +36,51 @@ class LightCameraController {
         isCameraActive = isActive
         guard appDelegate.lightsOnWithCamera else { return }
         if isActive {
-            turnOnAllLights()
+            checkAndTurnOnLights()
         } else {
-            turnOffLightsIfControlled()
+            turnOffControlledLights()
         }
+    }
+
+    private func checkAndTurnOnLights() {
+        for device in deviceManager.devices where device.isOnline {
+            Task {
+                do {
+                    try await device.fetchLightInfo()
+                    if !device.isOn {
+                        try await device.turnOn()
+                        lightsControlledByCamera.insert(device)
+                        logger.info("Turned on device: \(device.name)")
+                    } else {
+                        logger.info("Device already on: \(device.name)")
+                    }
+                } catch {
+                    logger
+                        .error(
+                            "Failed to check or turn on device: \(device.name). Error: \(error.localizedDescription)"
+                        )
+                }
+            }
+        }
+        logger.info("Checked and turned on necessary lights due to camera activity")
+    }
+
+    private func turnOffControlledLights() {
+        for device in lightsControlledByCamera {
+            Task {
+                do {
+                    try await device.turnOff()
+                    logger.info("Turned off controlled device: \(device.name)")
+                } catch {
+                    logger
+                        .error(
+                            "Failed to turn off controlled device: \(device.name). Error: \(error.localizedDescription)"
+                        )
+                }
+            }
+        }
+
+        lightsControlledByCamera.removeAll()
     }
 
     private func turnOnAllLights() {
@@ -47,6 +88,7 @@ class LightCameraController {
             Task {
                 do {
                     try await device.turnOn()
+                    lightsControlledByCamera.insert(device)
                     logger.info("Turned on device: \(device.name)")
                 } catch {
                     logger
@@ -56,26 +98,6 @@ class LightCameraController {
                 }
             }
         }
-        areLightsControlledByCamera = true
-        logger.info("All lights turned on due to camera activity")
-    }
-
-    private func turnOffLightsIfControlled() {
-        guard areLightsControlledByCamera else { return }
-        for device in deviceManager.devices where device.isOnline {
-            Task {
-                do {
-                    try await device.turnOff()
-                    logger.info("Turned off device: \(device.name)")
-                } catch {
-                    logger
-                        .error(
-                            "Failed to turn off device: \(device.name). Error: \(error.localizedDescription)"
-                        )
-                }
-            }
-        }
-        areLightsControlledByCamera = false
-        logger.info("All lights turned off due to camera inactivity")
+        logger.info("All lights turned on due to lights-on-with-camera setting")
     }
 }

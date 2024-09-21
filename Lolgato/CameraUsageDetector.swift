@@ -45,9 +45,11 @@ class CameraUsageDetector {
 
         do {
             let isActive = try isCameraOn()
-            if isActive != lastActiveState, lastActiveState != nil {
+            if isActive != lastActiveState {
+                if lastActiveState != nil {
+                    callback?(isActive)
+                }
                 lastActiveState = isActive
-                callback?(isActive)
             }
         } catch {
             logger.error("Error checking camera status: \(error.localizedDescription)")
