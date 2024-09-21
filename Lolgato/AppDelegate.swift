@@ -7,6 +7,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
     private var statusBarController: StatusBarController?
     private var cameraDetector: CameraUsageDetector?
     private var lightCameraController: LightCameraController?
+    private var lightSystemStateController: LightSystemStateController?
 
     @Published var lightsOnWithCamera: Bool {
         didSet {
@@ -39,6 +40,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
             deviceManager.startDiscovery()
         }
         setupCameraMonitoring()
+
+        lightSystemStateController = LightSystemStateController(
+            deviceManager: deviceManager!,
+            appDelegate: self
+        )
     }
 
     func applicationWillTerminate(_: Notification) {

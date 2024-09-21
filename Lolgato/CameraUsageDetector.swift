@@ -19,11 +19,12 @@ class CameraUsageDetector {
         self.callback = callback
         isMonitoringEnabled = enabled
 
-        stopMonitoring()
-
         if enabled {
             logger.info("Starting camera polling")
             startMonitoring(interval: interval)
+        } else {
+            logger.info("Stopping camera polling")
+            stopMonitoring()
         }
     }
 
