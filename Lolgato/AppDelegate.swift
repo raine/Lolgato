@@ -11,6 +11,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
     @Published var lightsOnWithCamera: Bool {
         didSet {
             UserDefaults.standard.set(lightsOnWithCamera, forKey: "lightsOnWithCamera")
+            updateCameraMonitoring()
         }
     }
 
@@ -47,7 +48,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
 
     private func setupCameraMonitoring() {
         cameraDetector = CameraUsageDetector()
-        cameraDetector?.startMonitoring { [weak self] isActive in
+        updateCameraMonitoring()
+    }
+
+    private func updateCameraMonitoring() {
+        cameraDetector?.updateMonitoring(enabled: lightsOnWithCamera) { [weak self] isActive in
             self?.lightCameraController?.handleCameraActivityChange(isActive: isActive)
         }
     }

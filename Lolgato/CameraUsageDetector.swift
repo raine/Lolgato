@@ -7,6 +7,7 @@ class CameraUsageDetector {
     private var callback: ((Bool) -> Void)?
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "CameraUsageDetector")
     private var lastActiveState: Bool?
+    private var isMonitoringEnabled: Bool = false
 
     enum CameraError: Error {
         case failedToGetDevices(OSStatus)
@@ -14,8 +15,19 @@ class CameraUsageDetector {
         case noDevicesFound
     }
 
-    func startMonitoring(interval: TimeInterval = 1.0, callback: @escaping (Bool) -> Void) {
+    func updateMonitoring(enabled: Bool, interval: TimeInterval = 1.0, callback: @escaping (Bool) -> Void) {
         self.callback = callback
+        isMonitoringEnabled = enabled
+
+        stopMonitoring()
+
+        if enabled {
+            logger.info("Starting camera polling")
+            startMonitoring(interval: interval)
+        }
+    }
+
+    private func startMonitoring(interval: TimeInterval) {
         timer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { [weak self] _ in
             self?.checkCameraStatus()
         }
@@ -28,6 +40,8 @@ class CameraUsageDetector {
     }
 
     private func checkCameraStatus() {
+        guard isMonitoringEnabled else { return }
+
         do {
             let isActive = try isCameraOn()
             if isActive != lastActiveState {
