@@ -5,7 +5,7 @@ import os
 
 class LightSystemStateController {
     private let deviceManager: ElgatoDeviceManager
-    private let appDelegate: AppDelegate
+    private let appState: AppState
     private var cancellables: Set<AnyCancellable> = []
     private let logger = Logger(
         subsystem: Bundle.main.bundleIdentifier!,
@@ -13,16 +13,16 @@ class LightSystemStateController {
     )
     private var screenLockMonitor: Any?
 
-    init(deviceManager: ElgatoDeviceManager, appDelegate: AppDelegate) {
+    init(deviceManager: ElgatoDeviceManager, appState: AppState) {
         self.deviceManager = deviceManager
-        self.appDelegate = appDelegate
+        self.appState = appState
         setupSubscriptions()
         setupNotificationObservers()
         setupScreenLockMonitor()
     }
 
     private func setupSubscriptions() {
-        appDelegate.$lightsOffOnSleep
+        appState.$lightsOffOnSleep
             .sink { [weak self] newValue in
                 self?.handleLightsOffOnSleepChange(newValue)
             }
@@ -66,7 +66,7 @@ class LightSystemStateController {
     }
 
     @objc private func handleSystemStateChange(notification: Notification) {
-        guard appDelegate.lightsOffOnSleep else { return }
+        guard appState.lightsOffOnSleep else { return }
         let reason: String
         switch notification.name {
         case NSWorkspace.willSleepNotification:
@@ -81,7 +81,7 @@ class LightSystemStateController {
     }
 
     private func handleScreenLock() {
-        guard appDelegate.lightsOffOnSleep else { return }
+        guard appState.lightsOffOnSleep else { return }
         logger.info("Screen locked. Turning off lights.")
         turnOffAllLights(reason: "screen lock")
     }

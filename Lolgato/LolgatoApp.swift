@@ -2,11 +2,12 @@ import SwiftUI
 
 @main
 struct LolgatoApp: App {
-    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    @StateObject private var coordinator = AppCoordinator()
 
     var body: some Scene {
-        Settings {
-            EmptyView()
+        MenuBarExtra("Lolgato", systemImage: "lightbulb") {
+            LolgatoMenu(appState: coordinator.appState, deviceManager: coordinator.deviceManager)
         }
+        .menuBarExtraStyle(.menu)
     }
 }

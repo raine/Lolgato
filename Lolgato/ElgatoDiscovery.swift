@@ -68,6 +68,7 @@ class ElgatoDiscovery: AsyncSequence {
 
         browser?.browseResultsChangedHandler = { [weak self] _, changes in
             guard let self = self else { return }
+
             for change in changes {
                 switch change {
                 case let .added(result):
@@ -130,9 +131,12 @@ class ElgatoDiscovery: AsyncSequence {
                     continuation.resume(returning: nil)
                 case .cancelled:
                     self.logger.info("Connection was cancelled")
-                case .setup, .preparing, .waiting:
-                    // These states don't require any action
-                    break
+                case .setup:
+                    self.logger.info("Connection is in setup state")
+                case .preparing:
+                    self.logger.info("Connection is in preparing state")
+                case .waiting:
+                    self.logger.info("Connection is in waiting state")
                 @unknown default:
                     self.logger.warning("Connection entered an unknown state")
                 }

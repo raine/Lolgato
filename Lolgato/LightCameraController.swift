@@ -4,22 +4,33 @@ import os
 
 class LightCameraController {
     private let deviceManager: ElgatoDeviceManager
-    private let appDelegate: AppDelegate
+    private let appState: AppState
+    private let cameraStatusPublisher: AnyPublisher<Bool, Never>
     private var cancellables: Set<AnyCancellable> = []
     private var lightsControlledByCamera: Set<ElgatoDevice> = []
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "LightCameraController")
     private var isCameraActive: Bool = false
 
-    init(deviceManager: ElgatoDeviceManager, appDelegate: AppDelegate) {
+    init(deviceManager: ElgatoDeviceManager,
+         appState: AppState,
+         cameraStatusPublisher: AnyPublisher<Bool, Never>)
+    {
         self.deviceManager = deviceManager
-        self.appDelegate = appDelegate
+        self.appState = appState
+        self.cameraStatusPublisher = cameraStatusPublisher
         setupSubscriptions()
     }
 
     private func setupSubscriptions() {
-        appDelegate.$lightsOnWithCamera
+        appState.$lightsOnWithCamera
             .sink { [weak self] newValue in
                 self?.handleLightsOnWithCameraChange(newValue)
+            }
+            .store(in: &cancellables)
+
+        cameraStatusPublisher
+            .sink { [weak self] isActive in
+                self?.handleCameraActivityChange(isActive: isActive)
             }
             .store(in: &cancellables)
     }
@@ -32,9 +43,9 @@ class LightCameraController {
         }
     }
 
-    func handleCameraActivityChange(isActive: Bool) {
+    private func handleCameraActivityChange(isActive: Bool) {
         isCameraActive = isActive
-        guard appDelegate.lightsOnWithCamera else { return }
+        guard appState.lightsOnWithCamera else { return }
         if isActive {
             checkAndTurnOnLights()
         } else {

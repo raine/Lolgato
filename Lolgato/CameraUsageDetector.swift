@@ -1,13 +1,18 @@
 import AVFoundation
+import Combine
 import CoreMediaIO
 import os
 
 class CameraUsageDetector {
     private var timer: Timer?
-    private var callback: ((Bool) -> Void)?
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "CameraUsageDetector")
     private var lastActiveState: Bool?
     private var isMonitoringEnabled: Bool = false
+
+    private let cameraStatusSubject = CurrentValueSubject<Bool, Never>(false)
+    var cameraStatusPublisher: AnyPublisher<Bool, Never> {
+        cameraStatusSubject.eraseToAnyPublisher()
+    }
 
     enum CameraError: Error {
         case failedToGetDevices(OSStatus)
@@ -15,8 +20,7 @@ class CameraUsageDetector {
         case noDevicesFound
     }
 
-    func updateMonitoring(enabled: Bool, interval: TimeInterval = 1.0, callback: @escaping (Bool) -> Void) {
-        self.callback = callback
+    func updateMonitoring(enabled: Bool, interval: TimeInterval = 1.0) {
         isMonitoringEnabled = enabled
 
         if enabled {
@@ -46,16 +50,14 @@ class CameraUsageDetector {
         do {
             let isActive = try isCameraOn()
             if isActive != lastActiveState {
-                if lastActiveState != nil {
-                    callback?(isActive)
-                }
                 lastActiveState = isActive
+                cameraStatusSubject.send(isActive)
             }
         } catch {
             logger.error("Error checking camera status: \(error.localizedDescription)")
             if lastActiveState != false {
                 lastActiveState = false
-                callback?(false)
+                cameraStatusSubject.send(false)
             }
         }
     }
