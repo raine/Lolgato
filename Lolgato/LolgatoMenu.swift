@@ -57,6 +57,9 @@ struct LolgatoMenu: View {
 
             Divider()
 
+            Text("Version \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "")")
+                .foregroundColor(.secondary)
+
             Button("Quit") {
                 NSApplication.shared.terminate(nil)
             }
