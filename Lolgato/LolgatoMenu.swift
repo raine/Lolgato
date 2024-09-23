@@ -1,23 +1,35 @@
 import SwiftUI
 
+struct DeviceRow: View {
+    @ObservedObject var device: ElgatoDevice
+
+    var body: some View {
+        Text(device.name)
+            .font(.subheadline)
+            .padding(.leading)
+    }
+}
+
 struct LolgatoMenu: View {
     @ObservedObject var appState: AppState
     @ObservedObject var deviceManager: ElgatoDeviceManager
+
+    var readyDevices: [ElgatoDevice] {
+        deviceManager.devices.filter { !$0.macAddress.isEmpty }
+    }
 
     var body: some View {
         VStack(alignment: .leading) {
             Text("Devices:")
                 .font(.headline)
-            if deviceManager.devices.isEmpty {
+            if readyDevices.isEmpty {
                 Text("No devices found")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
                     .padding(.leading)
             } else {
-                ForEach(deviceManager.devices, id: \.id) { device in
-                    Text(device.displayName ?? device.productName)
-                        .font(.subheadline)
-                        .padding(.leading)
+                ForEach(readyDevices, id: \.id) { device in
+                    DeviceRow(device: device)
                 }
             }
 

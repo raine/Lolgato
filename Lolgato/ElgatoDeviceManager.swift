@@ -9,7 +9,7 @@ struct WifiInfo: Codable {
     let rssi: Int
 }
 
-class ElgatoDevice: Identifiable, Equatable, Hashable {
+class ElgatoDevice: ObservableObject, Identifiable, Equatable, Hashable {
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "ElgatoDevice")
 
     let endpoint: NWEndpoint
@@ -17,20 +17,22 @@ class ElgatoDevice: Identifiable, Equatable, Hashable {
     var lastSeen: Date = .init()
     var isOn: Bool = false
 
-    var productName: String
+    @Published var productName: String
     var hardwareBoardType: Int
     var hardwareRevision: Double
     var macAddress: String
     var firmwareBuildNumber: Int
     var firmwareVersion: String
     var serialNumber: String
-    var displayName: String?
+    @Published var displayName: String?
     var features: [String]
     var wifiInfo: WifiInfo?
 
     var id: NWEndpoint { endpoint }
 
-    var name: String { displayName ?? productName }
+    var name: String {
+        displayName ?? productName
+    }
 
     init(endpoint: NWEndpoint) {
         self.endpoint = endpoint
@@ -291,7 +293,7 @@ class ElgatoDeviceManager: ObservableObject {
         do {
             try await device.fetchAccessoryInfo()
             await MainActor.run {
-                logger.info("Accessory info fetched for device: \(device.displayName ?? device.productName)")
+                logger.info("Accessory info fetched for device: \(device.name)")
                 self.objectWillChange.send()
             }
         } catch {
