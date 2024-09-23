@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+project_dir=$(git rev-parse --show-toplevel)
+project_name="Lolgato"
+scheme_name="Lolgato"
+configuration="Release"
+
+archive_path="$project_dir/build/$project_name.xcarchive"
+export_path="$project_dir/build"
+
+cd "$project_dir" || exit 1
+
+xcodebuild archive -project "$project_name.xcodeproj" -scheme "$scheme_name" -configuration "$configuration" -archivePath "$archive_path"
+
+cat <<EOF >export_options.plist
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>method</key>
+    <string>mac-application</string>
+    <key>signingStyle</key>
+    <string>automatic</string>
+</dict>
+</plist>
+EOF
+
+# Export the archive as a .app
+xcodebuild -exportArchive -archivePath "$archive_path" -exportPath "$export_path" -exportOptionsPlist export_options.plist
+
+echo "Build complete. .app file should be available at $export_path/$project_name.app"
+
+rm export_options.plist
+rm -rf "$archive_path"
