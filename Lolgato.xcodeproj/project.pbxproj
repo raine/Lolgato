@@ -11,9 +11,6 @@
 		F71906982C9CC444008D50F6 /* LolgatoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F71906972C9CC444008D50F6 /* LolgatoApp.swift */; };
 		F719069C2C9CC44E008D50F6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F719069B2C9CC44E008D50F6 /* Assets.xcassets */; };
 		F719069F2C9CC44E008D50F6 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F719069E2C9CC44E008D50F6 /* Preview Assets.xcassets */; };
-		F71906AA2C9CC44F008D50F6 /* LolgatoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F71906A92C9CC44F008D50F6 /* LolgatoTests.swift */; };
-		F71906B42C9CC44F008D50F6 /* LolgatoUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F71906B32C9CC44F008D50F6 /* LolgatoUITests.swift */; };
-		F71906B62C9CC44F008D50F6 /* LolgatoUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F71906B52C9CC44F008D50F6 /* LolgatoUITestsLaunchTests.swift */; };
 		F71906C82C9DC13B008D50F6 /* ElgatoDeviceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F71906C72C9DC13B008D50F6 /* ElgatoDeviceManager.swift */; };
 		F71906CA2C9DC467008D50F6 /* ElgatoDiscovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = F71906C92C9DC467008D50F6 /* ElgatoDiscovery.swift */; };
 		F71906CE2C9E3177008D50F6 /* CameraUsageDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = F71906CD2C9E3177008D50F6 /* CameraUsageDetector.swift */; };
@@ -51,10 +48,7 @@
 		F719069E2C9CC44E008D50F6 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		F71906A02C9CC44E008D50F6 /* Lolgato.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Lolgato.entitlements; sourceTree = "<group>"; };
 		F71906A52C9CC44F008D50F6 /* LolgatoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LolgatoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		F71906A92C9CC44F008D50F6 /* LolgatoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LolgatoTests.swift; sourceTree = "<group>"; };
 		F71906AF2C9CC44F008D50F6 /* LolgatoUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LolgatoUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		F71906B32C9CC44F008D50F6 /* LolgatoUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LolgatoUITests.swift; sourceTree = "<group>"; };
-		F71906B52C9CC44F008D50F6 /* LolgatoUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LolgatoUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		F71906C42C9CC74E008D50F6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		F71906C72C9DC13B008D50F6 /* ElgatoDeviceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElgatoDeviceManager.swift; sourceTree = "<group>"; };
 		F71906C92C9DC467008D50F6 /* ElgatoDiscovery.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ElgatoDiscovery.swift; sourceTree = "<group>"; };
@@ -97,8 +91,6 @@
 			isa = PBXGroup;
 			children = (
 				F71906962C9CC444008D50F6 /* Lolgato */,
-				F71906A82C9CC44F008D50F6 /* LolgatoTests */,
-				F71906B22C9CC44F008D50F6 /* LolgatoUITests */,
 				F71906952C9CC444008D50F6 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -140,31 +132,6 @@
 				F719069E2C9CC44E008D50F6 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
-			sourceTree = "<group>";
-		};
-		F71906A82C9CC44F008D50F6 /* LolgatoTests */ = {
-			isa = PBXGroup;
-			children = (
-				F71906A92C9CC44F008D50F6 /* LolgatoTests.swift */,
-			);
-			path = LolgatoTests;
-			sourceTree = "<group>";
-		};
-		F71906B22C9CC44F008D50F6 /* LolgatoUITests */ = {
-			isa = PBXGroup;
-			children = (
-				F71906B32C9CC44F008D50F6 /* LolgatoUITests.swift */,
-				F71906B52C9CC44F008D50F6 /* LolgatoUITestsLaunchTests.swift */,
-				F7F6F5B22CA1744900D0CF5F /* Frameworks */,
-			);
-			path = LolgatoUITests;
-			sourceTree = "<group>";
-		};
-		F7F6F5B22CA1744900D0CF5F /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -318,7 +285,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F71906AA2C9CC44F008D50F6 /* LolgatoTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -326,8 +292,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F71906B42C9CC44F008D50F6 /* LolgatoUITests.swift in Sources */,
-				F71906B62C9CC44F008D50F6 /* LolgatoUITestsLaunchTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
