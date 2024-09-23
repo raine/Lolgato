@@ -20,13 +20,35 @@ struct LolgatoMenu: View {
                         .padding(.leading)
                 }
             }
+
             Divider()
+
             Toggle("Lights on with Camera", isOn: $appState.lightsOnWithCamera)
             Toggle("Lights off on Sleep", isOn: $appState.lightsOffOnSleep)
+
             Divider()
+
+            Group {
+                if #available(macOS 14.0, *) {
+                    SettingsLink {
+                        Text("Settings...")
+                    }
+                } else {
+                    Button(action: {
+                        NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+                    }, label: {
+                        Text("Settings...")
+                    })
+                }
+            }
+            .keyboardShortcut(",", modifiers: .command)
+
+            Divider()
+
             Button("Quit") {
                 NSApplication.shared.terminate(nil)
             }
+            .keyboardShortcut("Q", modifiers: .command)
         }
         .padding()
         .frame(width: 250)

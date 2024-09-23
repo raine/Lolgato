@@ -1,4 +1,5 @@
 import Combine
+import KeyboardShortcuts
 import SwiftUI
 
 class AppState: ObservableObject {
@@ -46,6 +47,7 @@ class AppCoordinator: ObservableObject {
         deviceManager.startDiscovery()
         setupControllers()
         setupBindings()
+        setupShortcuts()
     }
 
     private func setupControllers() {
@@ -59,5 +61,13 @@ class AppCoordinator: ObservableObject {
                 self?.cameraDetector.updateMonitoring(enabled: enabled)
             }
             .store(in: &cancellables)
+    }
+
+    private func setupShortcuts() {
+        KeyboardShortcuts.onKeyUp(for: .toggleLights) { [weak self] in
+            Task {
+                await self?.deviceManager.toggleAllLights()
+            }
+        }
     }
 }

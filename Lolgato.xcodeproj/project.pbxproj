@@ -3,10 +3,11 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F710AF022CA1B81800A23571 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F710AF012CA1B81800A23571 /* Constants.swift */; };
 		F71906982C9CC444008D50F6 /* LolgatoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F71906972C9CC444008D50F6 /* LolgatoApp.swift */; };
 		F719069C2C9CC44E008D50F6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F719069B2C9CC44E008D50F6 /* Assets.xcassets */; };
 		F719069F2C9CC44E008D50F6 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F719069E2C9CC44E008D50F6 /* Preview Assets.xcassets */; };
@@ -20,6 +21,9 @@
 		F7EC5EE92CA160C0000EFB2C /* LightSystemStateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7EC5EE82CA160C0000EFB2C /* LightSystemStateController.swift */; };
 		F7EC5EEB2CA16116000EFB2C /* LolgatoMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7EC5EEA2CA16116000EFB2C /* LolgatoMenu.swift */; };
 		F7EC5EED2CA16135000EFB2C /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7EC5EEC2CA16135000EFB2C /* AppCoordinator.swift */; };
+		F7EC5EF12CA17259000EFB2C /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7EC5EF02CA17259000EFB2C /* Settings.swift */; };
+		F7F6F5B42CA1744900D0CF5F /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = F7F6F5B32CA1744900D0CF5F /* KeyboardShortcuts */; };
+		F7F6F5B72CA1747C00D0CF5F /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = F7F6F5B62CA1747C00D0CF5F /* LaunchAtLogin */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -40,6 +44,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		F710AF012CA1B81800A23571 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		F71906942C9CC444008D50F6 /* Lolgato.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Lolgato.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F71906972C9CC444008D50F6 /* LolgatoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LolgatoApp.swift; sourceTree = "<group>"; };
 		F719069B2C9CC44E008D50F6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -58,6 +63,7 @@
 		F7EC5EE82CA160C0000EFB2C /* LightSystemStateController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightSystemStateController.swift; sourceTree = "<group>"; };
 		F7EC5EEA2CA16116000EFB2C /* LolgatoMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LolgatoMenu.swift; sourceTree = "<group>"; };
 		F7EC5EEC2CA16135000EFB2C /* AppCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinator.swift; sourceTree = "<group>"; };
+		F7EC5EF02CA17259000EFB2C /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,6 +71,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F7F6F5B72CA1747C00D0CF5F /* LaunchAtLogin in Frameworks */,
+				F7F6F5B42CA1744900D0CF5F /* KeyboardShortcuts in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -91,6 +99,7 @@
 				F71906962C9CC444008D50F6 /* Lolgato */,
 				F71906A82C9CC44F008D50F6 /* LolgatoTests */,
 				F71906B22C9CC44F008D50F6 /* LolgatoUITests */,
+				F7F6F5B22CA1744900D0CF5F /* Frameworks */,
 				F71906952C9CC444008D50F6 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -108,6 +117,7 @@
 		F71906962C9CC444008D50F6 /* Lolgato */ = {
 			isa = PBXGroup;
 			children = (
+				F710AF012CA1B81800A23571 /* Constants.swift */,
 				F7EC5EE82CA160C0000EFB2C /* LightSystemStateController.swift */,
 				F71906CF2C9EDF86008D50F6 /* LightCameraController.swift */,
 				F71906C92C9DC467008D50F6 /* ElgatoDiscovery.swift */,
@@ -115,6 +125,7 @@
 				F71906972C9CC444008D50F6 /* LolgatoApp.swift */,
 				F7EC5EEC2CA16135000EFB2C /* AppCoordinator.swift */,
 				F7EC5EEA2CA16116000EFB2C /* LolgatoMenu.swift */,
+				F7EC5EF02CA17259000EFB2C /* Settings.swift */,
 				F71906CD2C9E3177008D50F6 /* CameraUsageDetector.swift */,
 				F719069B2C9CC44E008D50F6 /* Assets.xcassets */,
 				F71906A02C9CC44E008D50F6 /* Lolgato.entitlements */,
@@ -147,6 +158,13 @@
 				F71906B52C9CC44F008D50F6 /* LolgatoUITestsLaunchTests.swift */,
 			);
 			path = LolgatoUITests;
+			sourceTree = "<group>";
+		};
+		F7F6F5B22CA1744900D0CF5F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -237,6 +255,10 @@
 				Base,
 			);
 			mainGroup = F719068B2C9CC444008D50F6;
+			packageReferences = (
+				F7EC5EF72CA173E7000EFB2C /* XCLocalSwiftPackageReference "../../git/KeyboardShortcuts" */,
+				F7F6F5B52CA1746E00D0CF5F /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */,
+			);
 			productRefGroup = F71906952C9CC444008D50F6 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -284,7 +306,9 @@
 				F71906CE2C9E3177008D50F6 /* CameraUsageDetector.swift in Sources */,
 				F7EC5EE92CA160C0000EFB2C /* LightSystemStateController.swift in Sources */,
 				F7EC5EED2CA16135000EFB2C /* AppCoordinator.swift in Sources */,
+				F710AF022CA1B81800A23571 /* Constants.swift in Sources */,
 				F71906982C9CC444008D50F6 /* LolgatoApp.swift in Sources */,
+				F7EC5EF12CA17259000EFB2C /* Settings.swift in Sources */,
 				F71906D02C9EDF86008D50F6 /* LightCameraController.swift in Sources */,
 				F71906C82C9DC13B008D50F6 /* ElgatoDeviceManager.swift in Sources */,
 			);
@@ -460,7 +484,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Lolgato/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "";
-				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -492,7 +516,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Lolgato/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "";
-				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -619,6 +643,37 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		F7EC5EF72CA173E7000EFB2C /* XCLocalSwiftPackageReference "../../git/KeyboardShortcuts" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../../git/KeyboardShortcuts;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		F7F6F5B52CA1746E00D0CF5F /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/LaunchAtLogin-Modern";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		F7F6F5B32CA1744900D0CF5F /* KeyboardShortcuts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F7EC5EF72CA173E7000EFB2C /* XCLocalSwiftPackageReference "../../git/KeyboardShortcuts" */;
+			productName = KeyboardShortcuts;
+		};
+		F7F6F5B62CA1747C00D0CF5F /* LaunchAtLogin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F7F6F5B52CA1746E00D0CF5F /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */;
+			productName = LaunchAtLogin;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = F719068C2C9CC444008D50F6 /* Project object */;
 }

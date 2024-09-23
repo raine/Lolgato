@@ -310,4 +310,73 @@ class ElgatoDeviceManager: ObservableObject {
         devices.removeAll { $0.lastSeen < removalThreshold }
         objectWillChange.send()
     }
+
+    @MainActor
+    func toggleAllLights() async {
+        logger.info("Toggling all lights")
+
+        let onlineDevices = devices.filter { $0.isOnline }
+
+        // First, update the status of all online devices
+        await withTaskGroup(of: Void.self) { group in
+            for device in onlineDevices {
+                group.addTask {
+                    do {
+                        try await device.fetchLightInfo()
+                        await MainActor.run {
+                            self.logger
+                                .info(
+                                    "Updated status for device \(device.name): \(device.isOn ? "on" : "off")"
+                                )
+                        }
+                    } catch {
+                        await MainActor.run {
+                            self.logger
+                                .error(
+                                    "Failed to update status for device \(device.name): \(error.localizedDescription)"
+                                )
+                        }
+                    }
+                }
+            }
+        }
+
+        // Determine the action based on the current state of the lights
+        let anyLightOn = onlineDevices.contains { $0.isOn }
+        let actionIsOff = anyLightOn
+
+        // Now toggle the lights based on the determined action
+        await withTaskGroup(of: Void.self) { group in
+            for device in onlineDevices {
+                group.addTask {
+                    do {
+                        if actionIsOff {
+                            if device.isOn {
+                                try await device.turnOff()
+                                await MainActor.run {
+                                    self.logger.info("Turned off device \(device.name)")
+                                }
+                            }
+                        } else {
+                            if !device.isOn {
+                                try await device.turnOn()
+                                await MainActor.run {
+                                    self.logger.info("Turned on device \(device.name)")
+                                }
+                            }
+                        }
+                    } catch {
+                        await MainActor.run {
+                            self.logger
+                                .error(
+                                    "Failed to toggle device \(device.name): \(error.localizedDescription)"
+                                )
+                        }
+                    }
+                }
+            }
+        }
+
+        objectWillChange.send()
+    }
 }

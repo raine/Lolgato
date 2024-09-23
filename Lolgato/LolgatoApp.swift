@@ -9,5 +9,9 @@ struct LolgatoApp: App {
             LolgatoMenu(appState: coordinator.appState, deviceManager: coordinator.deviceManager)
         }
         .menuBarExtraStyle(.menu)
+
+        Settings {
+            SettingsView(appState: coordinator.appState)
+        }
     }
 }
