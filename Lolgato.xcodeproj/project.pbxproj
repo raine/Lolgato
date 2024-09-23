@@ -99,7 +99,6 @@
 				F71906962C9CC444008D50F6 /* Lolgato */,
 				F71906A82C9CC44F008D50F6 /* LolgatoTests */,
 				F71906B22C9CC44F008D50F6 /* LolgatoUITests */,
-				F7F6F5B22CA1744900D0CF5F /* Frameworks */,
 				F71906952C9CC444008D50F6 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -156,6 +155,7 @@
 			children = (
 				F71906B32C9CC44F008D50F6 /* LolgatoUITests.swift */,
 				F71906B52C9CC44F008D50F6 /* LolgatoUITestsLaunchTests.swift */,
+				F7F6F5B22CA1744900D0CF5F /* Frameworks */,
 			);
 			path = LolgatoUITests;
 			sourceTree = "<group>";
