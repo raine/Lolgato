@@ -119,7 +119,9 @@ class ElgatoDiscovery: AsyncSequence {
                 switch state {
                 case .ready:
                     if let resolvedEndpoint = connection.currentPath?.remoteEndpoint {
+                        logEndpointType(resolvedEndpoint, logger: logger)
                         self.logger.info("Resolved endpoint: \(resolvedEndpoint.debugDescription)")
+
                         continuation.resume(returning: resolvedEndpoint)
                     } else {
                         self.logger.warning("Could not resolve endpoint")
@@ -149,5 +151,25 @@ class ElgatoDiscovery: AsyncSequence {
         browser?.cancel()
         continuation?.finish()
         logger.info("Discovery stopped")
+    }
+}
+
+func logEndpointType(_ endpoint: NWEndpoint, logger: Logger) {
+    switch endpoint {
+    case let .hostPort(host, port):
+        logger.info("Endpoint is .hostPort - Host: \(host.debugDescription), Port: \(port.debugDescription)")
+    case let .service(name, type, domain, interface):
+        logger
+            .info(
+                "Endpoint is .service - Name: \(name), Type: \(type), Domain: \(domain), Interface: \(String(describing: interface))"
+            )
+    case let .unix(path):
+        logger.info("Endpoint is .unix - Path: \(path)")
+    case let .url(url):
+        logger.info("Endpoint is .url - URL: \(url)")
+    case .opaque:
+        logger.info("Endpoint is .opaque")
+    @unknown default:
+        logger.warning("Unknown endpoint type: \(endpoint.debugDescription)")
     }
 }
