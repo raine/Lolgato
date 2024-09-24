@@ -40,7 +40,6 @@ struct LolgatoMenu: View {
             Divider()
 
             Button("Check for Updates...", action: checkForUpdates)
-
             Group {
                 if #available(macOS 14.0, *) {
                     SettingsLink {
@@ -55,6 +54,7 @@ struct LolgatoMenu: View {
                 }
             }
             .keyboardShortcut(",", modifiers: .command)
+            Button("Export Debug Logs", action: exportLogs)
 
             Divider()
 
@@ -79,6 +79,12 @@ struct LolgatoMenu: View {
                     updateChecker.promptForNoUpdate()
                 }
             }
+        }
+    }
+
+    func exportLogs() {
+        if let fileURL = writeLogsToTemp() {
+            NSWorkspace.shared.selectFile(fileURL.path, inFileViewerRootedAtPath: "")
         }
     }
 }
