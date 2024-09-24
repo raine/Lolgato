@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <defs/>
+  <rect x="5" y="6" width="14" height="8.948" rx="2" ry="2" fill="none" stroke="black" stroke-width="2"/>
+  <path fill="black" d="M11 14L13 14L13 20L11 20L11 14Z"/>
+  <path style="stroke: rgb(0, 0, 0); fill: rgb(255, 255, 255); stroke-linecap: square;" d="M 16.417 8.247 L 7.352 8.231 C 7.352 8.231 7.302 12.871 7.302 12.831"/>
+</svg>

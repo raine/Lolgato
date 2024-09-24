@@ -6,7 +6,6 @@ struct DeviceRow: View {
     var body: some View {
         Text(device.name)
             .font(.subheadline)
-            .padding(.leading)
     }
 }
 
@@ -26,7 +25,6 @@ struct LolgatoMenu: View {
                 Text("No devices found")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
-                    .padding(.leading)
             } else {
                 ForEach(readyDevices, id: \.id) { device in
                     DeviceRow(device: device)

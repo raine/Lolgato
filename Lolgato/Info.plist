@@ -15,5 +15,7 @@
 	</array>
   <key>NSCameraUsageDescription</key>
   <string>This app needs to access the camera to detect its usage and control Elgato lights.</string>
+  <key>NSLocalNetworkUsageDescription</key>
+  <string>This app needs access to the local network to discover and connect to Elgato devices.</string>
 </dict>
 </plist>

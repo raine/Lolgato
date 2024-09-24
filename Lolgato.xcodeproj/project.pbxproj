@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		F710AF022CA1B81800A23571 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F710AF012CA1B81800A23571 /* Constants.swift */; };
+		F710AF042CA2CB7B00A23571 /* icon.svg in Resources */ = {isa = PBXBuildFile; fileRef = F710AF032CA2CB7B00A23571 /* icon.svg */; };
 		F71906982C9CC444008D50F6 /* LolgatoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F71906972C9CC444008D50F6 /* LolgatoApp.swift */; };
 		F719069C2C9CC44E008D50F6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F719069B2C9CC44E008D50F6 /* Assets.xcassets */; };
 		F719069F2C9CC44E008D50F6 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F719069E2C9CC44E008D50F6 /* Preview Assets.xcassets */; };
@@ -42,6 +43,7 @@
 
 /* Begin PBXFileReference section */
 		F710AF012CA1B81800A23571 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		F710AF032CA2CB7B00A23571 /* icon.svg */ = {isa = PBXFileReference; lastKnownFileType = text; path = icon.svg; sourceTree = "<group>"; };
 		F71906942C9CC444008D50F6 /* Lolgato.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Lolgato.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F71906972C9CC444008D50F6 /* LolgatoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LolgatoApp.swift; sourceTree = "<group>"; };
 		F719069B2C9CC44E008D50F6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -119,6 +121,7 @@
 				F7EC5EF02CA17259000EFB2C /* Settings.swift */,
 				F71906CD2C9E3177008D50F6 /* CameraUsageDetector.swift */,
 				F719069B2C9CC44E008D50F6 /* Assets.xcassets */,
+				F710AF032CA2CB7B00A23571 /* icon.svg */,
 				F71906A02C9CC44E008D50F6 /* Lolgato.entitlements */,
 				F71906C72C9DC13B008D50F6 /* ElgatoDeviceManager.swift */,
 				F719069D2C9CC44E008D50F6 /* Preview Content */,
@@ -243,6 +246,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F719069F2C9CC44E008D50F6 /* Preview Assets.xcassets in Resources */,
+				F710AF042CA2CB7B00A23571 /* icon.svg in Resources */,
 				F719069C2C9CC44E008D50F6 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -436,6 +440,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_ENTITLEMENTS = Lolgato/Lolgato.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -468,6 +473,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_ENTITLEMENTS = Lolgato/Lolgato.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
