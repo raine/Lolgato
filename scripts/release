@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# Set up variables
+repo_root=$(git rev-parse --show-toplevel)
+cd "$repo_root" || exit 1
+dmg_path="build/Lolgato.dmg"
+app_path="build/Lolgato.app"
+version=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$app_path/Contents/Info.plist")
+
+git tag "v$version"
+git push --tags origin "v$version"
+
+gh release create "v$version" "$dmg_path" \
+	--generate-notes
