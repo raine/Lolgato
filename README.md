@@ -29,9 +29,10 @@ Requires macOS 14 or later.
 ## How to Use
 
 1. Install the app and launch it.
-2. The app will appear in your menu bar.
-3. Click the menu bar icon to access controls and settings.
-4. Configure your preferences in the app settings.
+2. The app is not currently notarized with Apple, so you may need to allow the app in "Privacy & Security" settings.
+3. The app will appear in your menu bar.
+4. Click the menu bar icon to access controls and settings.
+5. Configure your preferences in the app settings.
 
 The app will discover Elgato lights in your network automatically, the same way was Elgato Control Center.
 
@@ -39,7 +40,7 @@ The app will discover Elgato lights in your network automatically, the same way 
 
 #### Can I use this with non-Elgato lights?
 
-This app is designed specifically for Elgato lights such as the Elgato Key Light. It may not work with other brands.
+This app is designed specifically for Elgato lights such as the Elgato Key Light.
 
 #### Does this replace the Elgato Control Center?
 
