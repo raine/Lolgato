@@ -1,4 +1,5 @@
 import KeyboardShortcuts
+import LaunchAtLogin
 import SwiftUI
 
 struct SettingsView: View {
@@ -7,7 +8,7 @@ struct SettingsView: View {
     var body: some View {
         GeneralSettingsView(appState: appState)
             .padding(30)
-            .frame(width: 500, height: 300)
+            .frame(width: 500, height: 380)
     }
 }
 
@@ -27,6 +28,14 @@ struct GeneralSettingsView: View {
             } caption: {
                 Text("Turn off lights when system goes to sleep or is locked.")
             }
+
+            Divider()
+
+            settingRow(label: "Launch:") {
+                LaunchAtLogin.Toggle("Automatically at system startup")
+            }
+
+            Divider()
 
             shortcutRow(
                 label: "Toggle Lights:",
@@ -53,6 +62,7 @@ struct GeneralSettingsView: View {
         KeyboardShortcuts.reset(.toggleLights)
         appState.lightsOnWithCamera = false
         appState.lightsOffOnSleep = false
+        LaunchAtLogin.isEnabled = false
     }
 }
 
