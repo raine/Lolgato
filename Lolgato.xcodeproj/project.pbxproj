@@ -16,6 +16,7 @@
 		F71906CA2C9DC467008D50F6 /* ElgatoDiscovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = F71906C92C9DC467008D50F6 /* ElgatoDiscovery.swift */; };
 		F71906CE2C9E3177008D50F6 /* CameraUsageDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = F71906CD2C9E3177008D50F6 /* CameraUsageDetector.swift */; };
 		F71906D02C9EDF86008D50F6 /* LightCameraController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F71906CF2C9EDF86008D50F6 /* LightCameraController.swift */; };
+		F741EA6D2CA2EDAF002D1BAD /* GithubUpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = F741EA6C2CA2EDAB002D1BAD /* GithubUpdateChecker.swift */; };
 		F7EC5EE92CA160C0000EFB2C /* LightSystemStateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7EC5EE82CA160C0000EFB2C /* LightSystemStateController.swift */; };
 		F7EC5EEB2CA16116000EFB2C /* LolgatoMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7EC5EEA2CA16116000EFB2C /* LolgatoMenu.swift */; };
 		F7EC5EED2CA16135000EFB2C /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7EC5EEC2CA16135000EFB2C /* AppCoordinator.swift */; };
@@ -56,6 +57,7 @@
 		F71906C92C9DC467008D50F6 /* ElgatoDiscovery.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ElgatoDiscovery.swift; sourceTree = "<group>"; };
 		F71906CD2C9E3177008D50F6 /* CameraUsageDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraUsageDetector.swift; sourceTree = "<group>"; };
 		F71906CF2C9EDF86008D50F6 /* LightCameraController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightCameraController.swift; sourceTree = "<group>"; };
+		F741EA6C2CA2EDAB002D1BAD /* GithubUpdateChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GithubUpdateChecker.swift; sourceTree = "<group>"; };
 		F7EC5EE82CA160C0000EFB2C /* LightSystemStateController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightSystemStateController.swift; sourceTree = "<group>"; };
 		F7EC5EEA2CA16116000EFB2C /* LolgatoMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LolgatoMenu.swift; sourceTree = "<group>"; };
 		F7EC5EEC2CA16135000EFB2C /* AppCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinator.swift; sourceTree = "<group>"; };
@@ -110,6 +112,7 @@
 		F71906962C9CC444008D50F6 /* Lolgato */ = {
 			isa = PBXGroup;
 			children = (
+				F741EA6C2CA2EDAB002D1BAD /* GithubUpdateChecker.swift */,
 				F710AF012CA1B81800A23571 /* Constants.swift */,
 				F7EC5EE82CA160C0000EFB2C /* LightSystemStateController.swift */,
 				F71906CF2C9EDF86008D50F6 /* LightCameraController.swift */,
@@ -280,6 +283,7 @@
 				F710AF022CA1B81800A23571 /* Constants.swift in Sources */,
 				F71906982C9CC444008D50F6 /* LolgatoApp.swift in Sources */,
 				F7EC5EF12CA17259000EFB2C /* Settings.swift in Sources */,
+				F741EA6D2CA2EDAF002D1BAD /* GithubUpdateChecker.swift in Sources */,
 				F71906D02C9EDF86008D50F6 /* LightCameraController.swift in Sources */,
 				F71906C82C9DC13B008D50F6 /* ElgatoDeviceManager.swift in Sources */,
 			);

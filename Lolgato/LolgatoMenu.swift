@@ -12,6 +12,7 @@ struct DeviceRow: View {
 struct LolgatoMenu: View {
     @ObservedObject var appState: AppState
     @ObservedObject var deviceManager: ElgatoDeviceManager
+    let updateChecker = GitHubUpdateChecker()
 
     var readyDevices: [ElgatoDevice] {
         deviceManager.devices.filter { !$0.macAddress.isEmpty }
@@ -37,6 +38,8 @@ struct LolgatoMenu: View {
             Toggle("Lights off on Sleep", isOn: $appState.lightsOffOnSleep)
 
             Divider()
+
+            Button("Check for Updates...", action: checkForUpdates)
 
             Group {
                 if #available(macOS 14.0, *) {
@@ -65,5 +68,17 @@ struct LolgatoMenu: View {
         }
         .padding()
         .frame(width: 250)
+    }
+
+    func checkForUpdates() {
+        updateChecker.checkForNewRelease { isNewVersionAvailable, latestVersion in
+            DispatchQueue.main.async {
+                if isNewVersionAvailable, let version = latestVersion {
+                    updateChecker.promptForUpdate(newVersion: version)
+                } else {
+                    updateChecker.promptForNoUpdate()
+                }
+            }
+        }
     }
 }
