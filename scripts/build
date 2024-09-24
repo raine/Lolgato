@@ -1,12 +1,22 @@
 #!/usr/bin/env bash
 
+# Set up variables
 project_dir=$(git rev-parse --show-toplevel)
 cd "$project_dir" || exit 1
 project_name="Lolgato"
-dmg_path="build/Lolgato.dmg"
+app_path="build/$project_name.app"
 
+# Build the app
 ./scripts/archive
 
-dmgbuild -s dmgbuild_settings.py -D app="build/Lolgato.app" "$project_name" "$dmg_path"
+# Extract version from Info.plist
+version=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$app_path/Contents/Info.plist")
 
-echo "Build and packaging complete."
+# Create DMG filename with version
+dmg_filename="${project_name}-${version}.dmg"
+dmg_path="build/$dmg_filename"
+
+# Build the DMG
+dmgbuild -s dmgbuild_settings.py -D app="$app_path" "$project_name" "$dmg_path"
+
+echo "Build and packaging complete. DMG created: $dmg_path"
