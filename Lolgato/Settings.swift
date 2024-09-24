@@ -6,8 +6,7 @@ struct SettingsView: View {
 
     var body: some View {
         GeneralSettingsView(appState: appState)
-            .padding(20)
-            .padding(.vertical, 40)
+            .padding(30)
             .frame(width: 500, height: 300)
     }
 }
