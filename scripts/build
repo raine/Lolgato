@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+project_dir=$(git rev-parse --show-toplevel)
+cd "$project_dir" || exit 1
+project_name="Lolgato"
+dmg_path="build/Lolgato.dmg"
+
+./scripts/archive
+
+dmgbuild -s dmgbuild_settings.py -D app="build/Lolgato.app" "$project_name" "$dmg_path"
+
+echo "Build and packaging complete."
