@@ -21,6 +21,9 @@ A macOS app that enhances control over Elgato lights, offering features beyond t
 
 Requires macOS 14 or later.
 
+> [!IMPORTANT]
+> The app is not currently notarized with Apple, so you may need to allow the app in "Privacy & Security" settings.
+
 ## Screenshots
 
 ![Demo](Meta/demo.gif)
