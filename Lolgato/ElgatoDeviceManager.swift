@@ -87,7 +87,7 @@ class ElgatoDevice: ObservableObject, Identifiable, Equatable, Hashable {
         }
 
         do {
-            logger.info("GET \(url)")
+            logger.info("GET \(url, privacy: .public)")
             let (data, _) = try await URLSession.shared.data(from: url)
             let json = try JSONDecoder().decode(LightResponse.self, from: data)
 
@@ -116,7 +116,7 @@ class ElgatoDevice: ObservableObject, Identifiable, Equatable, Hashable {
         }
 
         do {
-            logger.info("GET \(url)")
+            logger.info("GET \(url, privacy: .public)")
             let (data, _) = try await URLSession.shared.data(from: url)
             let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
 
@@ -232,7 +232,10 @@ class ElgatoDeviceManager: ObservableObject {
                     await handleDiscoveryEvent(event)
                 }
             } catch {
-                logger.error("Discovery stream ended with error: \(error.localizedDescription)")
+                logger
+                    .error(
+                        "Discovery stream ended with error: \(error.localizedDescription, privacy: .public)"
+                    )
             }
             logger.info("Discovery stream ended")
             self.discoveryTask = nil
@@ -247,7 +250,7 @@ class ElgatoDeviceManager: ObservableObject {
 
     @MainActor
     private func handleDiscoveryEvent(_ event: ElgatoDiscoveryEvent) {
-        logger.info("Discovery event: \(event.debugDescription)")
+        logger.info("Discovery event: \(event.debugDescription, privacy: .public)")
 
         switch event {
         case let .deviceFound(endpoint):
@@ -255,7 +258,7 @@ class ElgatoDeviceManager: ObservableObject {
         case let .deviceLost(endpoint):
             markDeviceOffline(for: endpoint)
         case let .error(error):
-            logger.error("Discovery error: \(error.localizedDescription)")
+            logger.error("Discovery error: \(error.localizedDescription, privacy: .public)")
         }
     }
 
@@ -268,7 +271,7 @@ class ElgatoDeviceManager: ObservableObject {
             let newDevice = ElgatoDevice(endpoint: endpoint)
             newDevice.lastSeen = Date()
 
-            logger.info("New device found: \(endpoint.debugDescription)")
+            logger.info("New device found: \(endpoint.debugDescription, privacy: .public)")
             devices.append(newDevice)
 
             newDeviceDiscovered.send(newDevice)
@@ -284,7 +287,7 @@ class ElgatoDeviceManager: ObservableObject {
     private func markDeviceOffline(for endpoint: NWEndpoint) {
         if let device = devices.first(where: { $0.endpoint == endpoint }) {
             device.isOnline = false
-            logger.info("Device went offline: \(endpoint.debugDescription)")
+            logger.info("Device went offline: \(endpoint.debugDescription, privacy: .public)")
             objectWillChange.send()
         }
     }
@@ -293,14 +296,14 @@ class ElgatoDeviceManager: ObservableObject {
         do {
             try await device.fetchAccessoryInfo()
             await MainActor.run {
-                logger.info("Accessory info fetched for device: \(device.name)")
+                logger.info("Accessory info fetched for device: \(device.name, privacy: .public)")
                 self.objectWillChange.send()
             }
         } catch {
             await MainActor.run {
                 logger
                     .error(
-                        "Failed to fetch accessory info for device: \(device.endpoint.debugDescription), error: \(error.localizedDescription)"
+                        "Failed to fetch accessory info for device: \(device.endpoint.debugDescription, privacy: .public), error: \(error.localizedDescription, privacy: .public)"
                     )
             }
         }
@@ -328,14 +331,14 @@ class ElgatoDeviceManager: ObservableObject {
                         await MainActor.run {
                             self.logger
                                 .info(
-                                    "Updated status for device \(device.name): \(device.isOn ? "on" : "off")"
+                                    "Updated status for device \(device.name, privacy: .public): \(device.isOn ? "on" : "off")"
                                 )
                         }
                     } catch {
                         await MainActor.run {
                             self.logger
                                 .error(
-                                    "Failed to update status for device \(device.name): \(error.localizedDescription)"
+                                    "Failed to update status for device \(device.name, privacy: .public): \(error.localizedDescription)"
                                 )
                         }
                     }
@@ -356,14 +359,14 @@ class ElgatoDeviceManager: ObservableObject {
                             if device.isOn {
                                 try await device.turnOff()
                                 await MainActor.run {
-                                    self.logger.info("Turned off device \(device.name)")
+                                    self.logger.info("Turned off device \(device.name, privacy: .public)")
                                 }
                             }
                         } else {
                             if !device.isOn {
                                 try await device.turnOn()
                                 await MainActor.run {
-                                    self.logger.info("Turned on device \(device.name)")
+                                    self.logger.info("Turned on device \(device.name, privacy: .public)")
                                 }
                             }
                         }
@@ -371,7 +374,7 @@ class ElgatoDeviceManager: ObservableObject {
                         await MainActor.run {
                             self.logger
                                 .error(
-                                    "Failed to toggle device \(device.name): \(error.localizedDescription)"
+                                    "Failed to toggle device \(device.name, privacy: .public): \(error.localizedDescription, privacy: .public)"
                                 )
                         }
                     }

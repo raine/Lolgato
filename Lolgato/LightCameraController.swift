@@ -61,14 +61,14 @@ class LightCameraController {
                     if !device.isOn {
                         try await device.turnOn()
                         lightsControlledByCamera.insert(device)
-                        logger.info("Turned on device: \(device.name)")
+                        logger.info("Turned on device: \(device.name, privacy: .public)")
                     } else {
-                        logger.info("Device already on: \(device.name)")
+                        logger.info("Device already on: \(device.name, privacy: .public)")
                     }
                 } catch {
                     logger
                         .error(
-                            "Failed to check or turn on device: \(device.name). Error: \(error.localizedDescription)"
+                            "Failed to check or turn on device: \(device.name, privacy: .public). Error: \(error.localizedDescription, privacy: .public)"
                         )
                 }
             }
@@ -81,11 +81,11 @@ class LightCameraController {
             Task {
                 do {
                     try await device.turnOff()
-                    logger.info("Turned off controlled device: \(device.name)")
+                    logger.info("Turned off controlled device: \(device.name, privacy: .public)")
                 } catch {
                     logger
                         .error(
-                            "Failed to turn off controlled device: \(device.name). Error: \(error.localizedDescription)"
+                            "Failed to turn off controlled device: \(device.name, privacy: .public). Error: \(error.localizedDescription, privacy: .public)"
                         )
                 }
             }
@@ -100,11 +100,11 @@ class LightCameraController {
                 do {
                     try await device.turnOn()
                     lightsControlledByCamera.insert(device)
-                    logger.info("Turned on device: \(device.name)")
+                    logger.info("Turned on device: \(device.name, privacy: .public)")
                 } catch {
                     logger
                         .error(
-                            "Failed to turn on device: \(device.name). Error: \(error.localizedDescription)"
+                            "Failed to turn on device: \(device.name, privacy: .public). Error: \(error.localizedDescription, privacy: .public)"
                         )
                 }
             }

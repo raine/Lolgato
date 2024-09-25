@@ -54,7 +54,7 @@ class CameraUsageDetector {
                 cameraStatusSubject.send(isActive)
             }
         } catch {
-            logger.error("Error checking camera status: \(error.localizedDescription)")
+            logger.error("Error checking camera status: \(error.localizedDescription, privacy: .public)")
             if lastActiveState != false {
                 lastActiveState = false
                 cameraStatusSubject.send(false)
@@ -131,7 +131,7 @@ class CameraUsageDetector {
         if result == kCMIOHardwareNoError {
             return isUsed != 0
         } else {
-            logger.error("Failed to get device usage status: \(result)")
+            logger.error("Failed to get device usage status: \(result, privacy: .public)")
             return nil
         }
     }

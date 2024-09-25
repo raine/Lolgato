@@ -62,7 +62,7 @@ class LightSystemStateController {
     }
 
     private func handleLightsOffOnSleepChange(_ newValue: Bool) {
-        logger.info("Lights off on sleep setting changed to: \(newValue)")
+        logger.info("Lights off on sleep setting changed to: \(newValue, privacy: .public)")
     }
 
     @objc private func handleSystemStateChange(notification: Notification) {
@@ -76,7 +76,7 @@ class LightSystemStateController {
         default:
             reason = "unknown reason"
         }
-        logger.info("System state changed due to \(reason). Turning off lights.")
+        logger.info("System state changed due to \(reason, privacy: .public). Turning off lights.")
         turnOffAllLights(reason: reason)
     }
 
@@ -93,7 +93,7 @@ class LightSystemStateController {
                     try await device.turnOff()
                     logger
                         .info(
-                            "Turned off device: \(device.name) due to \(reason)"
+                            "Turned off device: \(device.name, privacy: .public) due to \(reason, privacy: .public)"
                         )
                 } catch {
                     logger

@@ -52,7 +52,8 @@ class ElgatoDiscovery: AsyncSequence {
             case .ready:
                 self.logger.info("Browser is ready")
             case let .failed(error):
-                self.logger.error("Browser failed with error: \(error.localizedDescription)")
+                self.logger
+                    .error("Browser failed with error: \(error.localizedDescription, privacy: .public)")
                 self.continuation?.yield(.error(error))
             case .cancelled:
                 self.logger.info("Browser was cancelled")
@@ -120,7 +121,8 @@ class ElgatoDiscovery: AsyncSequence {
                 case .ready:
                     if let resolvedEndpoint = connection.currentPath?.remoteEndpoint {
                         logEndpointType(resolvedEndpoint, logger: logger)
-                        self.logger.info("Resolved endpoint: \(resolvedEndpoint.debugDescription)")
+                        self.logger
+                            .info("Resolved endpoint: \(resolvedEndpoint.debugDescription, privacy: .public)")
 
                         continuation.resume(returning: resolvedEndpoint)
                     } else {
@@ -129,7 +131,10 @@ class ElgatoDiscovery: AsyncSequence {
                     }
                     connection.cancel()
                 case let .failed(error):
-                    self.logger.error("Connection failed with error: \(error.localizedDescription)")
+                    self.logger
+                        .error(
+                            "Connection failed with error: \(error.localizedDescription, privacy: .public)"
+                        )
                     continuation.resume(returning: nil)
                 case .cancelled:
                     self.logger.info("Connection was cancelled")
@@ -157,19 +162,22 @@ class ElgatoDiscovery: AsyncSequence {
 func logEndpointType(_ endpoint: NWEndpoint, logger: Logger) {
     switch endpoint {
     case let .hostPort(host, port):
-        logger.info("Endpoint is .hostPort - Host: \(host.debugDescription), Port: \(port.debugDescription)")
+        logger
+            .info(
+                "Endpoint is .hostPort - Host: \(host.debugDescription, privacy: .public), Port: \(port.debugDescription, privacy: .public)"
+            )
     case let .service(name, type, domain, interface):
         logger
             .info(
-                "Endpoint is .service - Name: \(name), Type: \(type), Domain: \(domain), Interface: \(String(describing: interface))"
+                "Endpoint is .service - Name: \(name, privacy: .public), Type: \(type, privacy: .public), Domain: \(domain, privacy: .public), Interface: \(String(describing: interface))"
             )
     case let .unix(path):
-        logger.info("Endpoint is .unix - Path: \(path)")
+        logger.info("Endpoint is .unix - Path: \(path, privacy: .public)")
     case let .url(url):
-        logger.info("Endpoint is .url - URL: \(url)")
+        logger.info("Endpoint is .url - URL: \(url, privacy: .public)")
     case .opaque:
         logger.info("Endpoint is .opaque")
     @unknown default:
-        logger.warning("Unknown endpoint type: \(endpoint.debugDescription)")
+        logger.warning("Unknown endpoint type: \(endpoint.debugDescription, privacy: .public)")
     }
 }

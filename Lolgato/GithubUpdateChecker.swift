@@ -25,24 +25,24 @@ class GitHubUpdateChecker {
             completion(false, nil)
             return
         }
-        logger.info("Checking for new release at \(url)")
+        logger.info("Checking for new release at \(url, privacy: .public)")
 
         var request = URLRequest(url: url)
         request.httpMethod = "HEAD"
 
         URLSession.shared.dataTask(with: request) { _, response, error in
-            self.logger.info("Response: \(String(describing: response))")
+            self.logger.info("Response: \(String(describing: response), privacy: .public)")
 
             guard let httpResponse = response as? HTTPURLResponse,
                   let responseURL = httpResponse.url,
                   error == nil
             else {
-                self.logger.error("Error or invalid response: \(String(describing: error))")
+                self.logger.error("Error or invalid response: \(String(describing: error), privacy: .public)")
                 completion(false, nil)
                 return
             }
 
-            self.logger.info("Final response URL: \(responseURL)")
+            self.logger.info("Final response URL: \(responseURL, privacy: .public)")
 
             let versionRegex = try! NSRegularExpression(pattern: "/tag/v?([\\d.]+)")
             let urlString = responseURL.absoluteString
