@@ -1,3 +1,4 @@
+import SettingsAccess
 import SwiftUI
 
 struct DeviceRow: View {
@@ -44,7 +45,9 @@ struct LolgatoMenu: View {
                 if #available(macOS 14.0, *) {
                     SettingsLink {
                         Text("Settings...")
-                    }
+                    } preAction: {
+                        NSApp.activate(ignoringOtherApps: true)
+                    } postAction: {}
                 } else {
                     Button(action: {
                         NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)

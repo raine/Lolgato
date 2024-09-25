@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F70476092CA46DBA0084A2A2 /* SettingsAccess in Frameworks */ = {isa = PBXBuildFile; productRef = F70476082CA46DBA0084A2A2 /* SettingsAccess */; };
 		F710AF022CA1B81800A23571 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F710AF012CA1B81800A23571 /* Constants.swift */; };
 		F710AF042CA2CB7B00A23571 /* icon.svg in Resources */ = {isa = PBXBuildFile; fileRef = F710AF032CA2CB7B00A23571 /* icon.svg */; };
 		F71906982C9CC444008D50F6 /* LolgatoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F71906972C9CC444008D50F6 /* LolgatoApp.swift */; };
@@ -73,6 +74,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F70476092CA46DBA0084A2A2 /* SettingsAccess in Frameworks */,
 				F7F6F5B72CA1747C00D0CF5F /* LaunchAtLogin in Frameworks */,
 				F7F6F5B42CA1744900D0CF5F /* KeyboardShortcuts in Frameworks */,
 			);
@@ -95,10 +97,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		F70476062CA46DA60084A2A2 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		F719068B2C9CC444008D50F6 = {
 			isa = PBXGroup;
 			children = (
 				F71906962C9CC444008D50F6 /* Lolgato */,
+				F70476062CA46DA60084A2A2 /* Frameworks */,
 				F71906952C9CC444008D50F6 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -237,6 +247,7 @@
 			packageReferences = (
 				F7EC5EF72CA173E7000EFB2C /* XCLocalSwiftPackageReference "../../git/KeyboardShortcuts" */,
 				F7F6F5B52CA1746E00D0CF5F /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */,
+				F70476072CA46DBA0084A2A2 /* XCRemoteSwiftPackageReference "SettingsAccess" */,
 			);
 			productRefGroup = F71906952C9CC444008D50F6 /* Products */;
 			projectDirPath = "";
@@ -634,6 +645,14 @@
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		F70476072CA46DBA0084A2A2 /* XCRemoteSwiftPackageReference "SettingsAccess" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/orchetect/SettingsAccess";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
 		F7F6F5B52CA1746E00D0CF5F /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/sindresorhus/LaunchAtLogin-Modern";
@@ -645,6 +664,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		F70476082CA46DBA0084A2A2 /* SettingsAccess */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F70476072CA46DBA0084A2A2 /* XCRemoteSwiftPackageReference "SettingsAccess" */;
+			productName = SettingsAccess;
+		};
 		F7F6F5B32CA1744900D0CF5F /* KeyboardShortcuts */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = F7EC5EF72CA173E7000EFB2C /* XCLocalSwiftPackageReference "../../git/KeyboardShortcuts" */;
