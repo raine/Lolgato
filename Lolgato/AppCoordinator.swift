@@ -1,5 +1,6 @@
 import Combine
 import KeyboardShortcuts
+import os
 import SwiftUI
 
 class AppState: ObservableObject {
@@ -38,8 +39,15 @@ class AppCoordinator: ObservableObject {
 
     private var cameraDetector: CameraUsageDetector
     private var cancellables = Set<AnyCancellable>()
+    private let logger = Logger(
+        subsystem: Bundle.main.bundleIdentifier!,
+        category: "AppCoordinator"
+    )
 
     init() {
+        let version = Bundle.main
+            .object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "Unknown"
+        logger.info("Application started - Version: \(version)")
         let discovery = ElgatoDiscovery()
         deviceManager = ElgatoDeviceManager(discovery: discovery)
         appState = AppState()
