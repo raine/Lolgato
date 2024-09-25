@@ -22,7 +22,10 @@ A macOS app that enhances control over Elgato lights, offering features beyond t
 Requires macOS 14 or later.
 
 > [!IMPORTANT]
-> The app is not currently notarized with Apple, so you may need to allow the app in "Privacy & Security" settings.
+> The app is not currently notarized with Apple ([why?](https://github.com/disable-gatekeeper/disable-gatekeeper.github.io?tab=readme-ov-file#why)), so you need to allow the app in "Privacy & Security" settings,
+> or you can run `xattr -dr com.apple.quarantine /Applications/Lolgato.app` in Terminal.app.
+>
+> <img src="Meta/Gatekeeper.png" width="260">
 
 ## Screenshots
 
@@ -32,7 +35,8 @@ Requires macOS 14 or later.
 ## How to Use
 
 1. Install the app and launch it.
-2. The app is not currently notarized with Apple, so you may need to allow the app in "Privacy & Security" settings.
+2. The app is not currently notarized with Apple, so you may need to allow the app in "Privacy & Security" settings,
+   or you can run `xattr -dr com.apple.quarantine /Applications/Lolgato.app` in Terminal.app.
 3. The app will appear in your menu bar.
 4. Click the menu bar icon to access controls and settings.
 5. Configure your preferences in the app settings.
