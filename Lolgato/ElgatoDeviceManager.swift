@@ -108,10 +108,8 @@ class ElgatoDevice: ObservableObject, Identifiable, Equatable, Hashable {
             throw FetchError.invalidEndpoint
         }
 
-        let cleanHost = host.debugDescription.split(separator: "%").first.map(String.init) ?? host
-            .debugDescription
-        let urlString = "http://\(cleanHost):\(port)/elgato/accessory-info"
-        guard let url = URL(string: urlString) else {
+        guard let url = URL.createFromNetworkEndpoint(host: host, port: port, path: "/elgato/accessory-info")
+        else {
             throw FetchError.invalidURL
         }
 
@@ -160,6 +158,7 @@ class ElgatoDevice: ObservableObject, Identifiable, Equatable, Hashable {
 
     enum LightControlError: Error {
         case invalidEndpoint
+        case invalidURL
         case networkError(Error)
         case invalidResponse
     }
@@ -177,11 +176,9 @@ class ElgatoDevice: ObservableObject, Identifiable, Equatable, Hashable {
             throw LightControlError.invalidEndpoint
         }
 
-        let cleanHost = host.debugDescription.split(separator: "%").first.map(String.init) ?? host
-            .debugDescription
-        let urlString = "http://\(cleanHost):\(port)/elgato/lights"
-        guard let url = URL(string: urlString) else {
-            throw LightControlError.invalidEndpoint
+        guard let url = URL.createFromNetworkEndpoint(host: host, port: port, path: "/elgato/lights")
+        else {
+            throw LightControlError.invalidURL
         }
 
         var request = URLRequest(url: url)
