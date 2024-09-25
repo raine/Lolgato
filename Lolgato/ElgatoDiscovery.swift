@@ -43,6 +43,10 @@ class ElgatoDiscovery: AsyncSequence {
     private func startDiscovery() {
         let parameters = NWParameters()
         parameters.includePeerToPeer = true
+        if let ipOptions = parameters.defaultProtocolStack.internetProtocol as? NWProtocolIP.Options {
+            ipOptions.version = .v4
+        }
+
         let browserDescriptor = NWBrowser.Descriptor.bonjour(type: "_elg._tcp", domain: nil)
         browser = NWBrowser(for: browserDescriptor, using: parameters)
 
@@ -114,7 +118,14 @@ class ElgatoDiscovery: AsyncSequence {
 
     private func resolveEndpoint(_ endpoint: NWEndpoint) async -> NWEndpoint? {
         await withCheckedContinuation { continuation in
-            let connection = NWConnection(to: endpoint, using: .tcp)
+            let parameters = NWParameters.tcp
+            parameters.requiredInterfaceType = .wifi
+            parameters.includePeerToPeer = true
+            if let tcpOptions = parameters.defaultProtocolStack.internetProtocol as? NWProtocolIP.Options {
+                tcpOptions.version = .v4
+            }
+
+            let connection = NWConnection(to: endpoint, using: parameters)
             connection.stateUpdateHandler = { [weak self] state in
                 guard let self = self else { return }
                 switch state {
