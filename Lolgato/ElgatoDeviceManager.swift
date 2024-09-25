@@ -3,12 +3,6 @@ import Foundation
 import Network
 import os
 
-struct WifiInfo: Codable {
-    let ssid: String
-    let frequencyMHz: Int
-    let rssi: Int
-}
-
 class ElgatoDevice: ObservableObject, Identifiable, Equatable, Hashable {
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "ElgatoDevice")
 
@@ -18,15 +12,8 @@ class ElgatoDevice: ObservableObject, Identifiable, Equatable, Hashable {
     var isOn: Bool = false
 
     @Published var productName: String
-    var hardwareBoardType: Int
-    var hardwareRevision: Double
-    var macAddress: String
-    var firmwareBuildNumber: Int
-    var firmwareVersion: String
-    var serialNumber: String
     @Published var displayName: String?
-    var features: [String]
-    var wifiInfo: WifiInfo?
+    var macAddress: String
 
     var id: NWEndpoint { endpoint }
 
@@ -37,14 +24,8 @@ class ElgatoDevice: ObservableObject, Identifiable, Equatable, Hashable {
     init(endpoint: NWEndpoint) {
         self.endpoint = endpoint
         productName = ""
-        hardwareBoardType = 0
-        hardwareRevision = 0.0
         macAddress = ""
-        firmwareBuildNumber = 0
-        firmwareVersion = ""
-        serialNumber = ""
         displayName = ""
-        features = []
     }
 
     static func == (lhs: ElgatoDevice, rhs: ElgatoDevice) -> Bool {
@@ -122,34 +103,20 @@ class ElgatoDevice: ObservableObject, Identifiable, Equatable, Hashable {
                 throw FetchError.invalidResponse
             }
 
-            // Use a helper function to safely extract values and throw if missing
             func extract<T>(_ key: String) throws -> T {
                 guard let value = json[key] as? T else {
+                    logger.error("Missing required field '\(key, privacy: .public)' in response")
                     throw FetchError.missingRequiredField(key)
                 }
                 return value
             }
 
             productName = try extract("productName")
-            hardwareBoardType = try extract("hardwareBoardType")
-            hardwareRevision = try extract("hardwareRevision")
             macAddress = try extract("macAddress")
-            firmwareBuildNumber = try extract("firmwareBuildNumber")
-            firmwareVersion = try extract("firmwareVersion")
-            serialNumber = try extract("serialNumber")
             if let displayNameValue: String = try? extract("displayName") {
                 displayName = displayNameValue.isEmpty ? nil : displayNameValue
             } else {
                 displayName = nil
-            }
-            features = try extract("features")
-
-            if let wifiInfoDict: [String: Any] = try? extract("wifi-info") {
-                wifiInfo = WifiInfo(
-                    ssid: wifiInfoDict["ssid"] as? String ?? "",
-                    frequencyMHz: wifiInfoDict["frequencyMHz"] as? Int ?? 0,
-                    rssi: wifiInfoDict["rssi"] as? Int ?? 0
-                )
             }
         } catch {
             throw FetchError.networkError(error)
