@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+git_root=$(git rev-parse --show-toplevel)
+cd "$git_root"
+
+rm -rf ./build
+./scripts/build
+./scripts/release

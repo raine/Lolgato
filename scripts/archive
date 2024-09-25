@@ -10,6 +10,7 @@ export_path="$project_dir/build"
 
 cd "$project_dir" || exit 1
 
+mkdir -p "$export_path"
 xcodebuild archive -project "$project_name.xcodeproj" -scheme "$scheme_name" -configuration "$configuration" -archivePath "$archive_path"
 
 cat <<EOF >export_options.plist
