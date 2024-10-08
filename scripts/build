@@ -17,3 +17,13 @@ dmg_path="build/$dmg_filename"
 dmgbuild -s dmgbuild_settings.py -D app="$app_path" "$project_name" "$dmg_path"
 
 echo "Build and packaging complete. DMG created: $dmg_path"
+
+# Notarize the DMG
+echo "Submitting DMG for notarization..."
+xcrun notarytool submit "$dmg_path" --wait --apple-id "$APPLE_ID" --password "$APPLE_ID_PASSWORD" --team-id "$APPLE_TEAM_ID"
+
+# Staple the ticket to the DMG
+echo "Stapling notarization ticket to DMG..."
+xcrun stapler staple "$dmg_path"
+
+echo "Build, packaging, and notarization complete. Notarized DMG available at: $dmg_path"

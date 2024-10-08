@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
 project_dir=$(git rev-parse --show-toplevel)
 project_name="Lolgato"
 scheme_name="Lolgato"
 configuration="Release"
-
 archive_path="$project_dir/build/$project_name.xcarchive"
 export_path="$project_dir/build"
 
 cd "$project_dir" || exit 1
-
 mkdir -p "$export_path"
+
 xcodebuild archive -project "$project_name.xcodeproj" -scheme "$scheme_name" -configuration "$configuration" -archivePath "$archive_path"
 
 cat <<EOF >export_options.plist
@@ -19,14 +19,15 @@ cat <<EOF >export_options.plist
 <plist version="1.0">
 <dict>
     <key>method</key>
-    <string>mac-application</string>
+    <string>developer-id</string>
     <key>signingStyle</key>
     <string>automatic</string>
+    <key>teamID</key>
+    <string>${APPLE_TEAM_ID}</string>
 </dict>
 </plist>
 EOF
 
-# Export the archive as a .app
 xcodebuild -exportArchive -archivePath "$archive_path" -exportPath "$export_path" -exportOptionsPlist export_options.plist
 
 echo "Build complete. .app file should be available at $export_path/$project_name.app"
