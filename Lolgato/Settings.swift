@@ -34,9 +34,9 @@ struct GeneralSettingsView: View {
             }
 
             settingRow(label: "Sleep:") {
-                Toggle("Lights off automatically", isOn: $appState.lightsOffOnSleep)
+                Toggle("Lights on and off automatically", isOn: $appState.lightsOffOnSleep)
             } caption: {
-                Text("Turn off lights when system goes to sleep or is locked.")
+                Text("Turn off lights when system goes to sleep or is locked, and turn them back on when waking up.")
             }
 
             Divider()

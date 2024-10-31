@@ -12,6 +12,7 @@ class LightSystemStateController {
         category: "LightSystemStateController"
     )
     private var screenLockMonitor: Any?
+    private var lightsWereTurnedOff = false
 
     init(deviceManager: ElgatoDeviceManager, appState: AppState) {
         self.deviceManager = deviceManager
@@ -42,6 +43,18 @@ class LightSystemStateController {
             name: NSWorkspace.screensDidSleepNotification,
             object: nil
         )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleWakeUp),
+            name: NSWorkspace.didWakeNotification,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleWakeUp),
+            name: NSWorkspace.screensDidWakeNotification,
+            object: nil
+        )
     }
 
     private func setupScreenLockMonitor() {
@@ -52,6 +65,14 @@ class LightSystemStateController {
             queue: .main
         ) { [weak self] _ in
             self?.handleScreenLock()
+        }
+
+        distributed.addObserver(
+            forName: .init("com.apple.screenIsUnlocked"),
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.handleWakeUp(notification: Notification(name: Notification.Name("screenUnlock")))
         }
     }
 
@@ -91,6 +112,7 @@ class LightSystemStateController {
             Task {
                 do {
                     try await device.turnOff()
+                    lightsWereTurnedOff = true
                     logger
                         .info(
                             "Turned off device: \(device.name, privacy: .public) due to \(reason, privacy: .public)"
@@ -103,5 +125,40 @@ class LightSystemStateController {
                 }
             }
         }
+    }
+
+    @objc private func handleWakeUp(notification: Notification) {
+        guard appState.lightsOffOnSleep, lightsWereTurnedOff else { return }
+
+        let reason: String
+        switch notification.name {
+        case NSWorkspace.didWakeNotification:
+            reason = "computer wake"
+        case NSWorkspace.screensDidWakeNotification:
+            reason = "screen wake"
+        default:
+            reason = "unknown reason"
+        }
+
+        logger.info("System waking up due to \(reason, privacy: .public). Turning on lights.")
+
+        for device in deviceManager.devices where device.isOnline {
+            Task {
+                do {
+                    try await device.turnOn()
+                    logger
+                        .info(
+                            "Turned on device: \(device.name, privacy: .public) due to \(reason, privacy: .public)"
+                        )
+                } catch {
+                    logger
+                        .error(
+                            "Failed to turn on device: \(device.name) due to \(reason). Error: \(error.localizedDescription)"
+                        )
+                }
+            }
+        }
+
+        lightsWereTurnedOff = false
     }
 }
