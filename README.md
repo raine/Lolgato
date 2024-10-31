@@ -13,7 +13,10 @@ A macOS app that enhances control over Elgato lights, offering features beyond t
 
 - Automatically turn lights on and off based on camera activity
 - Turn lights off when locking your Mac
-- Global keyboard shortcut for toggling lights on and off
+- Global keyboard shortcuts:
+  - Toggle lights on and off
+  - Increase and decrease brightness of all lights
+  - Increase and decrease temperature of all lights
 
 ## Download
 
