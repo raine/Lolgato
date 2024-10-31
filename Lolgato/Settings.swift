@@ -18,7 +18,7 @@ struct SettingsView: View {
                 }
         }
         .padding(20)
-        .frame(width: 500, height: 300)
+        .frame(width: 500, height: 450)
     }
 }
 
@@ -67,6 +67,8 @@ struct KeyboardShortcutsView: View {
                 caption: "Toggle lights on/off."
             )
 
+            Divider()
+
             shortcutRow(
                 label: "Brightness Up:",
                 shortcut: .increaseBrightness,
@@ -77,6 +79,20 @@ struct KeyboardShortcutsView: View {
                 label: "Brightness Down:",
                 shortcut: .decreaseBrightness,
                 caption: "Decrease all lights' brightness."
+            )
+
+            Divider()
+
+            shortcutRow(
+                label: "Cooler:",
+                shortcut: .increaseTemperature,
+                caption: "Make lights cooler (more blue)."
+            )
+
+            shortcutRow(
+                label: "Warmer:",
+                shortcut: .decreaseTemperature,
+                caption: "Make lights warmer (more yellow)."
             )
 
             Spacer()
@@ -98,6 +114,8 @@ struct KeyboardShortcutsView: View {
         KeyboardShortcuts.reset(.toggleLights)
         KeyboardShortcuts.reset(.increaseBrightness)
         KeyboardShortcuts.reset(.decreaseBrightness)
+        KeyboardShortcuts.reset(.increaseTemperature)
+        KeyboardShortcuts.reset(.decreaseTemperature)
     }
 }
 

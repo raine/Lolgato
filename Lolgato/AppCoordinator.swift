@@ -101,5 +101,29 @@ class AppCoordinator: ObservableObject {
                 await deviceManager.setAllLightsBrightness(newBrightness)
             }
         }
+
+        KeyboardShortcuts.onKeyUp(for: .increaseTemperature) { [weak self] in
+            Task { @MainActor in
+                guard let deviceManager = self?.deviceManager else { return }
+                let currentTemp = deviceManager.devices
+                    .filter { $0.isOnline }
+                    .map { $0.temperature }
+                    .max() ?? 4000
+                let newTemp = min(currentTemp + 500, 7000)
+                await deviceManager.setAllLightsTemperature(newTemp)
+            }
+        }
+
+        KeyboardShortcuts.onKeyUp(for: .decreaseTemperature) { [weak self] in
+            Task { @MainActor in
+                guard let deviceManager = self?.deviceManager else { return }
+                let currentTemp = deviceManager.devices
+                    .filter { $0.isOnline }
+                    .map { $0.temperature }
+                    .max() ?? 4000
+                let newTemp = max(currentTemp - 500, 2900)
+                await deviceManager.setAllLightsTemperature(newTemp)
+            }
+        }
     }
 }

@@ -14,6 +14,8 @@ class ElgatoDevice: ObservableObject, Identifiable, Equatable, Hashable {
     @Published var productName: String
     @Published var displayName: String?
     @Published var brightness: Int = 0
+    @Published var temperature: Int = 4000 // Temperature in Kelvin
+    private var internalTemp: Int = 244 // Internal Elgato scale (143-344)
     var macAddress: String
 
     var id: NWEndpoint { endpoint }
@@ -80,6 +82,8 @@ class ElgatoDevice: ObservableObject, Identifiable, Equatable, Hashable {
             await MainActor.run {
                 self.isOn = lightStatus.on == 1
                 self.brightness = lightStatus.brightness
+                self.internalTemp = lightStatus.temperature
+                self.temperature = self.kelvinFromInternal(lightStatus.temperature)
             }
         } catch _ as DecodingError {
             throw FetchError.invalidResponse
@@ -192,6 +196,73 @@ class ElgatoDevice: ObservableObject, Identifiable, Equatable, Hashable {
         try await fetchLightInfo()
         let newBrightness = max(brightness - amount, 0)
         try await setBrightness(newBrightness)
+    }
+
+    private func internalFromKelvin(_ kelvin: Int) -> Int {
+        // Convert 2900K-7000K to 344-143
+        let percentage = Double(kelvin - 2900) / Double(7000 - 2900)
+        return 344 - Int(percentage * Double(344 - 143))
+    }
+
+    private func kelvinFromInternal(_ internal: Int) -> Int {
+        // Convert 344-143 to 2900K-7000K
+        let percentage = Double(344 - `internal`) / Double(344 - 143)
+        return 2900 + Int(percentage * Double(7000 - 2900))
+    }
+
+    func setTemperature(_ kelvin: Int) async throws {
+        guard (2900 ... 7000).contains(kelvin) else {
+            logger.error("Invalid temperature level: \(kelvin). Must be 2900-7000")
+            return
+        }
+
+        let internalValue = internalFromKelvin(kelvin)
+
+        guard case let .hostPort(host, port) = endpoint else {
+            throw LightControlError.invalidEndpoint
+        }
+
+        guard let url = URL.createFromNetworkEndpoint(host: host, port: port, path: "/elgato/lights") else {
+            throw LightControlError.invalidURL
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "PUT"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        let data = ["numberOfLights": 1, "lights": [["temperature": internalValue]]] as [String: Any]
+        request.httpBody = try JSONSerialization.data(withJSONObject: data)
+
+        do {
+            let (responseData, _) = try await URLSession.shared.data(for: request)
+            let json = try JSONSerialization.jsonObject(with: responseData, options: []) as? [String: Any]
+
+            guard let lights = json?["lights"] as? [[String: Any]],
+                  let firstLight = lights.first,
+                  let temperature = firstLight["temperature"] as? Int
+            else {
+                throw LightControlError.invalidResponse
+            }
+
+            await MainActor.run {
+                self.internalTemp = temperature
+                self.temperature = self.kelvinFromInternal(temperature)
+            }
+        } catch {
+            throw LightControlError.networkError(error)
+        }
+    }
+
+    func increaseTemperature(by amount: Int) async throws {
+        try await fetchLightInfo()
+        let newTemp = min(temperature + amount, 7000)
+        try await setTemperature(newTemp)
+    }
+
+    func decreaseTemperature(by amount: Int) async throws {
+        try await fetchLightInfo()
+        let newTemp = max(temperature - amount, 2900)
+        try await setTemperature(newTemp)
     }
 
     private func setLightState(on: Bool) async throws {
@@ -318,7 +389,7 @@ class ElgatoDeviceManager: ObservableObject {
         do {
             try await device.fetchAccessoryInfo()
             try await device.fetchLightInfo()
-            
+
             await MainActor.run {
                 logger.info("Initial state fetched for device: \(device.name, privacy: .public)")
                 self.objectWillChange.send()
@@ -431,6 +502,38 @@ class ElgatoDeviceManager: ObservableObject {
                             self.logger
                                 .error(
                                     "Failed to set brightness for device \(device.name, privacy: .public): \(error.localizedDescription, privacy: .public)"
+                                )
+                        }
+                    }
+                }
+            }
+        }
+
+        objectWillChange.send()
+    }
+
+    @MainActor
+    func setAllLightsTemperature(_ temperature: Int) async {
+        logger.info("Setting all lights temperature to \(temperature)")
+
+        let onlineDevices = devices.filter { $0.isOnline }
+
+        await withTaskGroup(of: Void.self) { group in
+            for device in onlineDevices {
+                group.addTask {
+                    do {
+                        try await device.setTemperature(temperature)
+                        await MainActor.run {
+                            self.logger
+                                .info(
+                                    "Set temperature to \(temperature) for device \(device.name, privacy: .public)"
+                                )
+                        }
+                    } catch {
+                        await MainActor.run {
+                            self.logger
+                                .error(
+                                    "Failed to set temperature for device \(device.name, privacy: .public): \(error.localizedDescription, privacy: .public)"
                                 )
                         }
                     }
