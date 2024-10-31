@@ -199,15 +199,12 @@ class ElgatoDevice: ObservableObject, Identifiable, Equatable, Hashable {
     }
 
     private func internalFromKelvin(_ kelvin: Int) -> Int {
-        // Convert 2900K-7000K to 344-143
-        let percentage = Double(kelvin - 2900) / Double(7000 - 2900)
-        return 344 - Int(percentage * Double(344 - 143))
+        return Int(round(987_007 * pow(Double(kelvin), -0.999)))
     }
 
     private func kelvinFromInternal(_ internal: Int) -> Int {
-        // Convert 344-143 to 2900K-7000K
-        let percentage = Double(344 - `internal`) / Double(344 - 143)
-        return 2900 + Int(percentage * Double(7000 - 2900))
+        let kelvin = round(1_000_000 * pow(Double(`internal`), -1.0) / 100) * 100
+        return Int(kelvin)
     }
 
     func setTemperature(_ kelvin: Int) async throws {
