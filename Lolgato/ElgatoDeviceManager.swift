@@ -13,6 +13,7 @@ class ElgatoDevice: ObservableObject, Identifiable, Equatable, Hashable {
 
     @Published var productName: String
     @Published var displayName: String?
+    @Published var brightness: Int = 0
     var macAddress: String
 
     var id: NWEndpoint { endpoint }
@@ -76,7 +77,10 @@ class ElgatoDevice: ObservableObject, Identifiable, Equatable, Hashable {
                 throw FetchError.invalidResponse
             }
 
-            isOn = lightStatus.on == 1
+            await MainActor.run {
+                self.isOn = lightStatus.on == 1
+                self.brightness = lightStatus.brightness
+            }
         } catch _ as DecodingError {
             throw FetchError.invalidResponse
         } catch {
@@ -138,6 +142,58 @@ class ElgatoDevice: ObservableObject, Identifiable, Equatable, Hashable {
         try await setLightState(on: false)
     }
 
+    func setBrightness(_ level: Int) async throws {
+        guard (0 ... 100).contains(level) else {
+            logger.error("Invalid brightness level: \(level). Must be 0-100")
+            return
+        }
+
+        guard case let .hostPort(host, port) = endpoint else {
+            throw LightControlError.invalidEndpoint
+        }
+
+        guard let url = URL.createFromNetworkEndpoint(host: host, port: port, path: "/elgato/lights") else {
+            throw LightControlError.invalidURL
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "PUT"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        let data = ["numberOfLights": 1, "lights": [["brightness": level]]] as [String: Any]
+        request.httpBody = try JSONSerialization.data(withJSONObject: data)
+
+        do {
+            let (responseData, _) = try await URLSession.shared.data(for: request)
+            let json = try JSONSerialization.jsonObject(with: responseData, options: []) as? [String: Any]
+
+            guard let lights = json?["lights"] as? [[String: Any]],
+                  let firstLight = lights.first,
+                  let brightness = firstLight["brightness"] as? Int
+            else {
+                throw LightControlError.invalidResponse
+            }
+
+            await MainActor.run {
+                self.brightness = brightness
+            }
+        } catch {
+            throw LightControlError.networkError(error)
+        }
+    }
+
+    func increaseBrightness(by amount: Int) async throws {
+        try await fetchLightInfo()
+        let newBrightness = min(brightness + amount, 100)
+        try await setBrightness(newBrightness)
+    }
+
+    func decreaseBrightness(by amount: Int) async throws {
+        try await fetchLightInfo()
+        let newBrightness = max(brightness - amount, 0)
+        try await setBrightness(newBrightness)
+    }
+
     private func setLightState(on: Bool) async throws {
         guard case let .hostPort(host, port) = endpoint else {
             throw LightControlError.invalidEndpoint
@@ -166,7 +222,9 @@ class ElgatoDevice: ObservableObject, Identifiable, Equatable, Hashable {
                 throw LightControlError.invalidResponse
             }
 
-            self.isOn = (isOn == 1)
+            await MainActor.run {
+                self.isOn = (isOn == 1)
+            }
         } catch {
             throw LightControlError.networkError(error)
         }
@@ -241,7 +299,7 @@ class ElgatoDeviceManager: ObservableObject {
             newDeviceDiscovered.send(newDevice)
 
             Task {
-                await fetchAccessoryInfo(for: newDevice)
+                await fetchInitialDeviceState(for: newDevice)
             }
         }
         objectWillChange.send()
@@ -256,18 +314,20 @@ class ElgatoDeviceManager: ObservableObject {
         }
     }
 
-    private func fetchAccessoryInfo(for device: ElgatoDevice) async {
+    private func fetchInitialDeviceState(for device: ElgatoDevice) async {
         do {
             try await device.fetchAccessoryInfo()
+            try await device.fetchLightInfo()
+            
             await MainActor.run {
-                logger.info("Accessory info fetched for device: \(device.name, privacy: .public)")
+                logger.info("Initial state fetched for device: \(device.name, privacy: .public)")
                 self.objectWillChange.send()
             }
         } catch {
             await MainActor.run {
                 logger
                     .error(
-                        "Failed to fetch accessory info for device: \(device.endpoint.debugDescription, privacy: .public), error: \(error.localizedDescription, privacy: .public)"
+                        "Failed to fetch initial state for device: \(device.endpoint.debugDescription, privacy: .public), error: \(error.localizedDescription, privacy: .public)"
                     )
             }
         }
@@ -339,6 +399,38 @@ class ElgatoDeviceManager: ObservableObject {
                             self.logger
                                 .error(
                                     "Failed to toggle device \(device.name, privacy: .public): \(error.localizedDescription, privacy: .public)"
+                                )
+                        }
+                    }
+                }
+            }
+        }
+
+        objectWillChange.send()
+    }
+
+    @MainActor
+    func setAllLightsBrightness(_ brightness: Int) async {
+        logger.info("Setting all lights brightness to \(brightness)")
+
+        let onlineDevices = devices.filter { $0.isOnline }
+
+        await withTaskGroup(of: Void.self) { group in
+            for device in onlineDevices {
+                group.addTask {
+                    do {
+                        try await device.setBrightness(brightness)
+                        await MainActor.run {
+                            self.logger
+                                .info(
+                                    "Set brightness to \(brightness) for device \(device.name, privacy: .public)"
+                                )
+                        }
+                    } catch {
+                        await MainActor.run {
+                            self.logger
+                                .error(
+                                    "Failed to set brightness for device \(device.name, privacy: .public): \(error.localizedDescription, privacy: .public)"
                                 )
                         }
                     }

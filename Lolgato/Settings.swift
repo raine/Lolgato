@@ -6,9 +6,19 @@ struct SettingsView: View {
     @ObservedObject var appState: AppState
 
     var body: some View {
-        GeneralSettingsView(appState: appState)
-            .padding(30)
-            .frame(width: 500, height: 380)
+        TabView {
+            GeneralSettingsView(appState: appState)
+                .tabItem {
+                    Label("General", systemImage: "gear")
+                }
+
+            KeyboardShortcutsView()
+                .tabItem {
+                    Label("Shortcuts", systemImage: "keyboard")
+                }
+        }
+        .padding(20)
+        .frame(width: 500, height: 300)
     }
 }
 
@@ -35,12 +45,38 @@ struct GeneralSettingsView: View {
                 LaunchAtLogin.Toggle("Automatically at system startup")
             }
 
+            Spacer()
             Divider()
+            ResetButton(action: resetToDefaults)
+        }
+    }
 
+    private func resetToDefaults() {
+        appState.lightsOnWithCamera = false
+        appState.lightsOffOnSleep = false
+        LaunchAtLogin.isEnabled = false
+    }
+}
+
+struct KeyboardShortcutsView: View {
+    var body: some View {
+        VStack(spacing: 20) {
             shortcutRow(
                 label: "Toggle Lights:",
                 shortcut: .toggleLights,
                 caption: "Toggle lights on/off."
+            )
+
+            shortcutRow(
+                label: "Brightness Up:",
+                shortcut: .increaseBrightness,
+                caption: "Increase all lights' brightness."
+            )
+
+            shortcutRow(
+                label: "Brightness Down:",
+                shortcut: .decreaseBrightness,
+                caption: "Decrease all lights' brightness."
             )
 
             Spacer()
@@ -60,9 +96,8 @@ struct GeneralSettingsView: View {
 
     private func resetToDefaults() {
         KeyboardShortcuts.reset(.toggleLights)
-        appState.lightsOnWithCamera = false
-        appState.lightsOffOnSleep = false
-        LaunchAtLogin.isEnabled = false
+        KeyboardShortcuts.reset(.increaseBrightness)
+        KeyboardShortcuts.reset(.decreaseBrightness)
     }
 }
 

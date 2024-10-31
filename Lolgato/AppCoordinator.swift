@@ -73,8 +73,32 @@ class AppCoordinator: ObservableObject {
 
     private func setupShortcuts() {
         KeyboardShortcuts.onKeyUp(for: .toggleLights) { [weak self] in
-            Task {
+            Task { @MainActor in
                 await self?.deviceManager.toggleAllLights()
+            }
+        }
+
+        KeyboardShortcuts.onKeyUp(for: .increaseBrightness) { [weak self] in
+            Task { @MainActor in
+                guard let deviceManager = self?.deviceManager else { return }
+                let currentBrightness = deviceManager.devices
+                    .filter { $0.isOnline }
+                    .map { $0.brightness }
+                    .max() ?? 0
+                let newBrightness = min(currentBrightness + 10, 100)
+                await deviceManager.setAllLightsBrightness(newBrightness)
+            }
+        }
+
+        KeyboardShortcuts.onKeyUp(for: .decreaseBrightness) { [weak self] in
+            Task { @MainActor in
+                guard let deviceManager = self?.deviceManager else { return }
+                let currentBrightness = deviceManager.devices
+                    .filter { $0.isOnline }
+                    .map { $0.brightness }
+                    .max() ?? 0
+                let newBrightness = max(currentBrightness - 10, 0)
+                await deviceManager.setAllLightsBrightness(newBrightness)
             }
         }
     }
