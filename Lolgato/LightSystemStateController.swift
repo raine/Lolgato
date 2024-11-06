@@ -108,15 +108,27 @@ class LightSystemStateController {
     }
 
     private func turnOffAllLights(reason: String) {
-        for device in deviceManager.devices where device.isOnline {
-            Task {
+        let onlineDevices = deviceManager.devices.filter { $0.isOnline }
+        guard !onlineDevices.isEmpty else { return }
+
+        Task {
+            var anyLightWasTurnedOff = false
+            for device in onlineDevices {
                 do {
-                    try await device.turnOff()
-                    lightsWereTurnedOff = true
-                    logger
-                        .info(
-                            "Turned off device: \(device.name, privacy: .public) due to \(reason, privacy: .public)"
-                        )
+                    try await device.fetchLightInfo()
+                    if device.isOn {
+                        try await device.turnOff()
+                        anyLightWasTurnedOff = true
+                        logger
+                            .info(
+                                "Turned off device: \(device.name, privacy: .public) due to \(reason, privacy: .public)"
+                            )
+                    } else {
+                        logger
+                            .info(
+                                "Device already off: \(device.name, privacy: .public)"
+                            )
+                    }
                 } catch {
                     logger
                         .error(
@@ -124,11 +136,19 @@ class LightSystemStateController {
                         )
                 }
             }
+
+            lightsWereTurnedOff = anyLightWasTurnedOff
+            if anyLightWasTurnedOff {
+                logger.info("Successfully turned off lights that were previously on")
+            } else {
+                logger.info("No lights needed to be turned off")
+            }
         }
     }
 
     @objc private func handleWakeUp(notification: Notification) {
-        guard appState.lightsOffOnSleep, lightsWereTurnedOff else { return }
+        guard appState.lightsOffOnSleep else { return }
+        guard lightsWereTurnedOff else { return }
 
         let reason: String
         switch notification.name {
