@@ -119,7 +119,6 @@ class ElgatoDiscovery: AsyncSequence {
     private func resolveEndpoint(_ endpoint: NWEndpoint) async -> NWEndpoint? {
         await withCheckedContinuation { continuation in
             let parameters = NWParameters.tcp
-            parameters.requiredInterfaceType = .wifi
             parameters.includePeerToPeer = true
             if let tcpOptions = parameters.defaultProtocolStack.internetProtocol as? NWProtocolIP.Options {
                 tcpOptions.version = .v4
