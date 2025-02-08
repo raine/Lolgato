@@ -11,7 +11,14 @@ export_path="$project_dir/build"
 cd "$project_dir" || exit 1
 mkdir -p "$export_path"
 
-xcodebuild archive -project "$project_name.xcodeproj" -scheme "$scheme_name" -configuration "$configuration" -archivePath "$archive_path"
+xcodebuild archive \
+	-project "$project_name.xcodeproj" \
+	-scheme "$scheme_name" \
+	-configuration "$configuration" \
+	-archivePath "$archive_path" \
+	-arch arm64 \
+	-arch x86_64 \
+	ONLY_ACTIVE_ARCH=NO
 
 cat <<EOF >export_options.plist
 <?xml version="1.0" encoding="UTF-8"?>
