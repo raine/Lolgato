@@ -2,7 +2,6 @@ import SwiftUI
 
 struct DeviceSettingsView: View {
     @ObservedObject var deviceManager: ElgatoDeviceManager
-    @Environment(\.openURL) private var openURL
     @State private var isAddingDevice = false
     @State private var newDeviceAddress = ""
     @State private var showingAddDeviceError = false
@@ -54,6 +53,22 @@ struct DeviceSettingsView: View {
 
     private var deviceTable: some View {
         Table(deviceManager.devices.sorted(by: { $0.name < $1.name })) {
+            TableColumn("Managed") { device in
+                Toggle("", isOn: Binding(
+                    get: { device.isManaged },
+                    set: { newValue in
+                        device.isManaged = newValue
+                        updateDeviceManagement(device)
+                    }
+                ))
+                .labelsHidden()
+                .toggleStyle(.checkbox)
+                .help(
+                    "When checked, this device will be controlled by the app. When unchecked, the app will never control this device."
+                )
+            }
+            .width(60)
+
             TableColumn("Name", value: \.name)
                 .width(min: 120, ideal: 150)
 
@@ -99,38 +114,20 @@ struct DeviceSettingsView: View {
         }
     }
 
-    private func toggleDevice(_ device: ElgatoDevice, isOn: Bool) {
-        Task {
-            do {
-                if isOn {
-                    try await device.turnOn()
-                } else {
-                    try await device.turnOff()
-                }
-            } catch {
-                // Handle error
-                print("Error toggling device: \(error)")
-            }
-        }
-    }
+    private func addDeviceManually() {
+        guard !newDeviceAddress.isEmpty else { return }
 
-    private func updateDeviceBrightness(_ device: ElgatoDevice, brightness: Int) {
-        Task {
-            do {
-                try await device.setBrightness(brightness)
-            } catch {
-                print("Error updating brightness: \(error)")
-            }
-        }
-    }
+        Task { @MainActor in
+            let success = deviceManager.addDeviceManually(ipAddress: newDeviceAddress)
 
-    private func updateDeviceTemperature(_ device: ElgatoDevice, temperature: Int) {
-        Task {
-            do {
-                try await device.setTemperature(temperature)
-            } catch {
-                print("Error updating temperature: \(error)")
+            if !success {
+                showingAddDeviceError = true
+                addDeviceErrorMessage =
+                    "Failed to add device. Please check the IP address and ensure the device is powered on and connected to your network."
             }
+
+            isAddingDevice = false
+            newDeviceAddress = ""
         }
     }
 
@@ -154,20 +151,10 @@ struct DeviceSettingsView: View {
         deviceManager.removeStaleDevices()
     }
 
-    private func addDeviceManually() {
-        guard !newDeviceAddress.isEmpty else { return }
-
+    private func updateDeviceManagement(_: ElgatoDevice) {
+        // When changing management status, save the devices to persistent storage
         Task { @MainActor in
-            let success = deviceManager.addDeviceManually(ipAddress: newDeviceAddress)
-
-            if !success {
-                showingAddDeviceError = true
-                addDeviceErrorMessage =
-                    "Failed to add device. Please check the IP address and ensure the device is powered on and connected to your network."
-            }
-
-            isAddingDevice = false
-            newDeviceAddress = ""
+            deviceManager.saveDevicesToPersistentStorage()
         }
     }
 }

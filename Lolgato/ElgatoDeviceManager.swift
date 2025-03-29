@@ -3,6 +3,42 @@ import Foundation
 import Network
 import os
 
+struct StoredDeviceInfo: Codable {
+    let ipAddress: String
+    let port: UInt16
+    let lastSeen: Date
+    let displayName: String?
+    let isManaged: Bool
+
+    init(
+        ipAddress: String,
+        port: UInt16,
+        lastSeen: Date = Date(),
+        displayName: String? = nil,
+        isManaged: Bool = true
+    ) {
+        self.ipAddress = ipAddress
+        self.port = port
+        self.lastSeen = lastSeen
+        self.displayName = displayName
+        self.isManaged = isManaged
+    }
+
+    init?(from device: ElgatoDevice) {
+        guard case let .hostPort(host, port) = device.endpoint else {
+            return nil
+        }
+
+        let hostString = host.debugDescription.split(separator: "%").first.map(String.init) ?? host
+            .debugDescription
+        ipAddress = hostString
+        self.port = port.rawValue
+        lastSeen = device.lastSeen
+        displayName = device.displayName
+        isManaged = device.isManaged
+    }
+}
+
 class ElgatoDevice: ObservableObject, Identifiable, Equatable, Hashable {
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "ElgatoDevice")
 
@@ -15,6 +51,7 @@ class ElgatoDevice: ObservableObject, Identifiable, Equatable, Hashable {
     @Published var displayName: String?
     @Published var brightness: Int = 0
     @Published var temperature: Int = 4000 // Temperature in Kelvin
+    @Published var isManaged: Bool = true // Whether this device is controlled by the app
     private var internalTemp: Int = 244 // Internal Elgato scale (143-344)
     var macAddress: String
 
@@ -300,6 +337,8 @@ class ElgatoDevice: ObservableObject, Identifiable, Equatable, Hashable {
 }
 
 class ElgatoDeviceManager: ObservableObject {
+    private static let storedDevicesKey = "com.lolgato.storedDevices"
+
     @Published private(set) var devices: [ElgatoDevice] = []
     private let discovery: ElgatoDiscovery
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "ElgatoDeviceManager")
@@ -368,6 +407,10 @@ class ElgatoDeviceManager: ObservableObject {
 
             Task {
                 await fetchInitialDeviceState(for: newDevice)
+                // Save devices after discovering a new one
+                await MainActor.run {
+                    saveDevicesToPersistentStorage()
+                }
             }
         }
         objectWillChange.send()
@@ -541,6 +584,91 @@ class ElgatoDeviceManager: ObservableObject {
         objectWillChange.send()
     }
 
+    // MARK: - Device Persistence
+
+    @MainActor
+    func saveDevicesToPersistentStorage() {
+        let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "DevicePersistence")
+
+        var storedDevices: [StoredDeviceInfo] = []
+
+        for device in devices {
+            if let storedInfo = StoredDeviceInfo(from: device) {
+                storedDevices.append(storedInfo)
+            }
+        }
+
+        do {
+            let encoder = JSONEncoder()
+            let data = try encoder.encode(storedDevices)
+            UserDefaults.standard.set(data, forKey: Self.storedDevicesKey)
+            logger.info("Saved \(storedDevices.count) devices to persistent storage")
+        } catch {
+            logger.error("Failed to save devices: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    @MainActor
+    func loadDevicesFromPersistentStorage() {
+        let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "DevicePersistence")
+
+        guard let data = UserDefaults.standard.data(forKey: Self.storedDevicesKey) else {
+            logger.info("No stored devices found")
+            return
+        }
+
+        do {
+            let decoder = JSONDecoder()
+            let storedDevices = try decoder.decode([StoredDeviceInfo].self, from: data)
+
+            logger.info("Found \(storedDevices.count) stored devices")
+
+            for storedDevice in storedDevices {
+                // Create a new device for each stored entry
+                let host = NWEndpoint.Host(storedDevice.ipAddress)
+                let port = NWEndpoint.Port(rawValue: storedDevice.port)!
+                let endpoint = NWEndpoint.hostPort(host: host, port: port)
+
+                // Skip if device already exists
+                if devices.contains(where: { $0.endpoint == endpoint }) {
+                    continue
+                }
+
+                let newDevice = ElgatoDevice(endpoint: endpoint)
+                newDevice.lastSeen = storedDevice.lastSeen
+                newDevice.isOnline = false // Default to offline until we can confirm
+                newDevice.isManaged = storedDevice.isManaged
+                if let displayName = storedDevice.displayName {
+                    newDevice.displayName = displayName
+                }
+
+                devices.append(newDevice)
+
+                // Try to fetch the device state
+                Task {
+                    do {
+                        try await newDevice.fetchAccessoryInfo()
+                        try await newDevice.fetchLightInfo()
+                        await MainActor.run {
+                            newDevice.isOnline = true
+                            logger.info("Restored device: \(newDevice.name, privacy: .public)")
+                            objectWillChange.send()
+                        }
+                    } catch {
+                        logger
+                            .warning(
+                                "Failed to connect to stored device \(storedDevice.ipAddress, privacy: .public): \(error.localizedDescription, privacy: .public)"
+                            )
+                    }
+                }
+            }
+        } catch {
+            logger.error("Failed to load stored devices: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    // MARK: - Manual Device Addition
+
     @MainActor
     func addDeviceManually(ipAddress: String, port: UInt16 = 9123) -> Bool {
         let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "ElgatoDeviceManager")
@@ -561,9 +689,7 @@ class ElgatoDeviceManager: ObservableObject {
         // Check if device with this endpoint already exists
         if devices.contains(where: { $0.endpoint == endpoint }) {
             logger
-                .warning(
-                    "Device with endpoint \(endpoint.debugDescription, privacy: .public) already exists"
-                )
+                .warning("Device with endpoint \(endpoint.debugDescription, privacy: .public) already exists")
             return false
         }
 
@@ -578,6 +704,11 @@ class ElgatoDeviceManager: ObservableObject {
         // Try to fetch initial device state
         Task {
             await fetchInitialDeviceState(for: newDevice)
+
+            // Save devices to persistent storage after adding a new one
+            await MainActor.run {
+                saveDevicesToPersistentStorage()
+            }
         }
 
         objectWillChange.send()
