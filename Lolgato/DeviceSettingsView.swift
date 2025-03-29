@@ -195,6 +195,13 @@ struct DeviceSettingsView: View {
             Text("Add Device Manually")
                 .font(.headline)
 
+            Text(
+                "Devices are normally discovered automatically. If a device isn't found, you can add it manually using its IP address."
+            )
+            .font(.caption)
+            .foregroundColor(.secondary)
+            .padding(.bottom, 4)
+
             Text("Enter the IP address of your Elgato device:")
                 .font(.caption)
                 .foregroundColor(.secondary)
