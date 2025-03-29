@@ -108,7 +108,8 @@ class LightSystemStateController {
     }
 
     private func turnOffAllLights(reason: String) {
-        let onlineDevices = deviceManager.devices.filter { $0.isOnline }
+        let onlineDevices = deviceManager.devices.filter { $0.isOnline && $0.isManaged }
+
         guard !onlineDevices.isEmpty else { return }
 
         Task {
@@ -162,7 +163,7 @@ class LightSystemStateController {
 
         logger.info("System waking up due to \(reason, privacy: .public). Turning on lights.")
 
-        for device in deviceManager.devices where device.isOnline {
+        for device in deviceManager.devices where device.isOnline && device.isManaged {
             Task {
                 do {
                     try await device.turnOn()

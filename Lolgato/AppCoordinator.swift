@@ -52,10 +52,15 @@ class AppCoordinator: ObservableObject {
         deviceManager = ElgatoDeviceManager(discovery: discovery)
         appState = AppState()
         cameraDetector = CameraUsageDetector()
-        deviceManager.startDiscovery()
+
         setupControllers()
         setupBindings()
         setupShortcuts()
+
+        Task { @MainActor in
+            deviceManager.loadDevicesFromPersistentStorage()
+            deviceManager.startDiscovery()
+        }
     }
 
     private func setupControllers() {
