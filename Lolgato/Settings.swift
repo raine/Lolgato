@@ -4,6 +4,12 @@ import SwiftUI
 
 struct SettingsView: View {
     @ObservedObject var appState: AppState
+    @ObservedObject var deviceManager: ElgatoDeviceManager
+
+    init(appState: AppState, deviceManager: ElgatoDeviceManager) {
+        self.appState = appState
+        self.deviceManager = deviceManager
+    }
 
     var body: some View {
         TabView {
@@ -12,13 +18,18 @@ struct SettingsView: View {
                     Label("General", systemImage: "gear")
                 }
 
+            DeviceSettingsView(deviceManager: deviceManager)
+                .tabItem {
+                    Label("Devices", systemImage: "lightbulb")
+                }
+
             KeyboardShortcutsView()
                 .tabItem {
                     Label("Shortcuts", systemImage: "keyboard")
                 }
         }
         .padding(20)
-        .frame(width: 500, height: 450)
+        .frame(width: 600, height: 450)
     }
 }
 
@@ -36,7 +47,9 @@ struct GeneralSettingsView: View {
             settingRow(label: "Sleep:") {
                 Toggle("Lights on and off automatically", isOn: $appState.lightsOffOnSleep)
             } caption: {
-                Text("Turn off lights when system goes to sleep or is locked, and turn them back on when waking up.")
+                Text(
+                    "Turn off lights when system goes to sleep or is locked, and turn them back on when waking up."
+                )
             }
 
             Divider()

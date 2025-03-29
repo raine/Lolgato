@@ -540,4 +540,59 @@ class ElgatoDeviceManager: ObservableObject {
 
         objectWillChange.send()
     }
+
+    @MainActor
+    func addDeviceManually(ipAddress: String, port: UInt16 = 9123) -> Bool {
+        let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "ElgatoDeviceManager")
+        logger.info("Attempting to add device manually with IP: \(ipAddress, privacy: .public)")
+
+        // NWEndpoint.Host initializer doesn't return an optional
+        let host = NWEndpoint.Host(ipAddress)
+
+        // Validate the IP address format
+        if !isValidIPAddress(ipAddress) {
+            logger.error("Invalid IP address format: \(ipAddress, privacy: .public)")
+            return false
+        }
+
+        let nwPort = NWEndpoint.Port(rawValue: port)!
+        let endpoint = NWEndpoint.hostPort(host: host, port: nwPort)
+
+        // Check if device with this endpoint already exists
+        if devices.contains(where: { $0.endpoint == endpoint }) {
+            logger
+                .warning(
+                    "Device with endpoint \(endpoint.debugDescription, privacy: .public) already exists"
+                )
+            return false
+        }
+
+        // Create a new device
+        let newDevice = ElgatoDevice(endpoint: endpoint)
+        newDevice.lastSeen = Date()
+        newDevice.isOnline = true
+
+        devices.append(newDevice)
+        newDeviceDiscovered.send(newDevice)
+
+        // Try to fetch initial device state
+        Task {
+            await fetchInitialDeviceState(for: newDevice)
+        }
+
+        objectWillChange.send()
+        logger.info("Manually added device with endpoint: \(endpoint.debugDescription, privacy: .public)")
+        return true
+    }
+
+    // Helper method to validate IP address format
+    private func isValidIPAddress(_ ipAddress: String) -> Bool {
+        // Basic IPv4 validation pattern
+        let ipv4Pattern =
+            #"^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"#
+
+        let regex = try? NSRegularExpression(pattern: ipv4Pattern)
+        let range = NSRange(location: 0, length: ipAddress.utf16.count)
+        return regex?.firstMatch(in: ipAddress, range: range) != nil
+    }
 }
