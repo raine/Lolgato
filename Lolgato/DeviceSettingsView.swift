@@ -54,11 +54,16 @@ struct DeviceSettingsView: View {
     private var deviceTable: some View {
         Table(deviceManager.devices.sorted(by: { $0.name < $1.name })) {
             TableColumn("Managed") { device in
-                Toggle("", isOn: Binding(
+                Toggle("", isOn: Binding<Bool>(
                     get: { device.isManaged },
                     set: { newValue in
-                        device.isManaged = newValue
-                        updateDeviceManagement(device)
+                        // Use withAnimation if you want the visual change to animate
+                        // It might not be strictly necessary for a background task trigger
+                        // withAnimation {
+                        Task { @MainActor in // Ensure UI updates happen on main thread if needed
+                            deviceManager.setDeviceManaged(device, isManaged: newValue)
+                        }
+                        // }
                     }
                 ))
                 .labelsHidden()
@@ -117,7 +122,7 @@ struct DeviceSettingsView: View {
     private func addDeviceManually() {
         guard !newDeviceAddress.isEmpty else { return }
 
-        Task { @MainActor in
+        Task<Void, Never> { @MainActor in
             let success = deviceManager.addDeviceManually(ipAddress: newDeviceAddress)
 
             if !success {
@@ -149,12 +154,5 @@ struct DeviceSettingsView: View {
 
         // Remove stale devices
         deviceManager.removeStaleDevices()
-    }
-
-    private func updateDeviceManagement(_: ElgatoDevice) {
-        // When changing management status, save the devices to persistent storage
-        Task { @MainActor in
-            deviceManager.saveDevicesToPersistentStorage()
-        }
     }
 }

@@ -455,7 +455,7 @@ class ElgatoDeviceManager: ObservableObject {
     func toggleAllLights() async {
         logger.info("Toggling all lights")
 
-        let onlineDevices = devices.filter { $0.isOnline }
+        let onlineDevices = devices.filter { $0.isOnline && $0.isManaged }
 
         // First, update the status of all online devices
         await withTaskGroup(of: Void.self) { group in
@@ -524,7 +524,7 @@ class ElgatoDeviceManager: ObservableObject {
     func setAllLightsBrightness(_ brightness: Int) async {
         logger.info("Setting all lights brightness to \(brightness)")
 
-        let onlineDevices = devices.filter { $0.isOnline }
+        let onlineDevices = devices.filter { $0.isOnline && $0.isManaged }
 
         await withTaskGroup(of: Void.self) { group in
             for device in onlineDevices {
@@ -556,7 +556,7 @@ class ElgatoDeviceManager: ObservableObject {
     func setAllLightsTemperature(_ temperature: Int) async {
         logger.info("Setting all lights temperature to \(temperature)")
 
-        let onlineDevices = devices.filter { $0.isOnline }
+        let onlineDevices = devices.filter { $0.isOnline && $0.isManaged }
 
         await withTaskGroup(of: Void.self) { group in
             for device in onlineDevices {
@@ -711,9 +711,23 @@ class ElgatoDeviceManager: ObservableObject {
             }
         }
 
-        objectWillChange.send()
+        objectWillChange.send() 
         logger.info("Manually added device with endpoint: \(endpoint.debugDescription, privacy: .public)")
         return true
+    }
+
+    @MainActor
+    func setDeviceManaged(_ device: ElgatoDevice, isManaged: Bool) {
+        if let index = devices.firstIndex(where: { $0.endpoint == device.endpoint }) {
+            devices[index].isManaged = isManaged
+            saveDevicesToPersistentStorage()
+            objectWillChange.send()
+
+            logger
+                .info(
+                    "Device \(device.name, privacy: .public) management status changed to: \(isManaged ? "managed" : "unmanaged")"
+                )
+        }
     }
 
     // Helper method to validate IP address format
