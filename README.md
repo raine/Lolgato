@@ -36,7 +36,7 @@ Requires macOS 14 or later.
 3. Click the menu bar icon to access controls and settings.
 4. Configure your preferences in the app settings.
 
-The app will discover Elgato lights in your network automatically, the same way was Elgato Control Center.
+The app will discover Elgato lights in your network automatically, the same way as Elgato Control Center. If automatic discovery doesn't find your devices, you can add them manually by IP address in the Devices tab of the settings window.
 
 ## FAQ
 
@@ -51,6 +51,10 @@ No, this app complements the Elgato Control Center by providing additional featu
 #### How does the app detect if the camera is active?
 
 The app uses macOS system APIs to detect camera activity across different applications.
+
+#### What if my devices aren't automatically discovered?
+
+If automatic discovery doesn't find your Elgato lights, you can add them manually by IP address. Go to Settings → Devices and click the "Add Device" button to enter the IP address of your Elgato light.
 
 ## Feedback and Support
 
