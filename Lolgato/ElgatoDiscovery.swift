@@ -165,6 +165,7 @@ class ElgatoDiscovery: AsyncSequence {
     func stopDiscovery() {
         browser?.cancel()
         continuation?.finish()
+        discoveredEndpoints.removeAll()
         logger.info("Discovery stopped")
     }
 }

@@ -247,17 +247,14 @@ struct DeviceSettingsView: View {
     private func refreshDevices() {
         guard !isRefreshing else { return }
 
-        // Set refreshing state to true to show spinner
         isRefreshing = true
 
         Task {
-            // Create a task group to handle all device refreshes with timeouts
+            // First refresh the status of existing devices
             await withTaskGroup(of: Void.self) { group in
-                // First refresh the status of existing devices
                 for device in deviceManager.devices where device.isOnline {
                     group.addTask {
                         do {
-                            // Create a task for the device refresh with a timeout
                             try await withTimeout(seconds: 5) {
                                 try await device.fetchLightInfo()
                             }
@@ -266,22 +263,20 @@ struct DeviceSettingsView: View {
                         }
                     }
                 }
-
-                // Wait for all device refresh tasks to complete (with timeouts)
                 await group.waitForAll()
             }
 
-            // Restart discovery to find new devices
+            // Stop discovery and wait a moment
             deviceManager.stopDiscovery()
+
+            // Add a small delay to ensure browser state is fully reset
+            try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 second delay
+
             deviceManager.startDiscovery()
 
-            // Remove stale devices
-            deviceManager.removeStaleDevices()
+            // Add a minimum delay so the spinner is visible
+            try? await Task.sleep(nanoseconds: 2_000_000_000) // 2 seconds
 
-            // Add a minimum delay so the spinner is visible even for quick refreshes
-            try? await Task.sleep(nanoseconds: 1_500_000_000) // 1.5 seconds
-
-            // Set refreshing back to false after a delay to show completion
             await MainActor.run {
                 isRefreshing = false
             }
