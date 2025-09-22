@@ -16,9 +16,16 @@ class AppState: ObservableObject {
         }
     }
 
+    @Published var syncWithNightShift: Bool {
+        didSet {
+            UserDefaults.standard.set(syncWithNightShift, forKey: "syncWithNightShift")
+        }
+    }
+
     init() {
         lightsOnWithCamera = UserDefaults.standard.bool(forKey: "lightsOnWithCamera")
         lightsOffOnSleep = UserDefaults.standard.bool(forKey: "lightsOffOnSleep")
+        syncWithNightShift = UserDefaults.standard.bool(forKey: "syncWithNightShift")
     }
 }
 
@@ -33,6 +40,11 @@ class AppCoordinator: ObservableObject {
     )
 
     lazy var lightSystemStateController: LightSystemStateController = .init(
+        deviceManager: deviceManager,
+        appState: appState
+    )
+
+    lazy var nightShiftSyncController: NightShiftSyncController = .init(
         deviceManager: deviceManager,
         appState: appState
     )
@@ -66,6 +78,7 @@ class AppCoordinator: ObservableObject {
     private func setupControllers() {
         _ = lightCameraController
         _ = lightSystemStateController
+        _ = nightShiftSyncController
     }
 
     private func setupBindings() {

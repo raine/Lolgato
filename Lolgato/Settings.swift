@@ -52,6 +52,12 @@ struct GeneralSettingsView: View {
                 )
             }
 
+            settingRow(label: "Night Shift:") {
+                Toggle("Sync with Night Shift", isOn: $appState.syncWithNightShift)
+            } caption: {
+                Text("Automatically adjust light temperature to match macOS Night Shift.")
+            }
+
             Divider()
 
             settingRow(label: "Launch:") {
@@ -67,6 +73,7 @@ struct GeneralSettingsView: View {
     private func resetToDefaults() {
         appState.lightsOnWithCamera = false
         appState.lightsOffOnSleep = false
+        appState.syncWithNightShift = false
         LaunchAtLogin.isEnabled = false
     }
 }

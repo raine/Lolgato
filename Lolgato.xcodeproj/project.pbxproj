@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		F70476092CA46DBA0084A2A2 /* SettingsAccess in Frameworks */ = {isa = PBXBuildFile; productRef = F70476082CA46DBA0084A2A2 /* SettingsAccess */; };
+		F70A653E2E81B94D00A1ACC4 /* NightShiftSyncController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F70A653D2E81B94D00A1ACC4 /* NightShiftSyncController.swift */; };
 		F710AF022CA1B81800A23571 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F710AF012CA1B81800A23571 /* Constants.swift */; };
 		F710AF042CA2CB7B00A23571 /* icon.svg in Resources */ = {isa = PBXBuildFile; fileRef = F710AF032CA2CB7B00A23571 /* icon.svg */; };
 		F71906982C9CC444008D50F6 /* LolgatoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F71906972C9CC444008D50F6 /* LolgatoApp.swift */; };
@@ -47,6 +48,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		F70A653D2E81B94D00A1ACC4 /* NightShiftSyncController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightShiftSyncController.swift; sourceTree = "<group>"; };
 		F710AF012CA1B81800A23571 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		F710AF032CA2CB7B00A23571 /* icon.svg */ = {isa = PBXFileReference; lastKnownFileType = text; path = icon.svg; sourceTree = "<group>"; };
 		F71906942C9CC444008D50F6 /* Lolgato.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Lolgato.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -128,6 +130,7 @@
 		F71906962C9CC444008D50F6 /* Lolgato */ = {
 			isa = PBXGroup;
 			children = (
+				F70A653D2E81B94D00A1ACC4 /* NightShiftSyncController.swift */,
 				F7A3B4562D9870F300F29741 /* DeviceSettingsView.swift */,
 				F741EA702CA45405002D1BAD /* URLExtension.swift */,
 				F741EA6E2CA37929002D1BAD /* LogUtils.swift */,
@@ -306,6 +309,7 @@
 				F71906982C9CC444008D50F6 /* LolgatoApp.swift in Sources */,
 				F7EC5EF12CA17259000EFB2C /* Settings.swift in Sources */,
 				F741EA6D2CA2EDAF002D1BAD /* GithubUpdateChecker.swift in Sources */,
+				F70A653E2E81B94D00A1ACC4 /* NightShiftSyncController.swift in Sources */,
 				F71906D02C9EDF86008D50F6 /* LightCameraController.swift in Sources */,
 				F71906C82C9DC13B008D50F6 /* ElgatoDeviceManager.swift in Sources */,
 				F7A3B4572D9870F300F29741 /* DeviceSettingsView.swift in Sources */,
