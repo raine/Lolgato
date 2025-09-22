@@ -132,10 +132,10 @@ struct KeyboardShortcutsView: View {
     }
 }
 
-func settingRow<Content: View, Caption: View>(
+func settingRow(
     label: String,
-    @ViewBuilder content: () -> Content,
-    @ViewBuilder caption: () -> Caption = { EmptyView() }
+    @ViewBuilder content: () -> some View,
+    @ViewBuilder caption: () -> some View = { EmptyView() }
 ) -> some View {
     HStack(alignment: .top) {
         Text(label)

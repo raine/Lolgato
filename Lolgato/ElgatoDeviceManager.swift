@@ -149,7 +149,7 @@ class ElgatoDevice: ObservableObject, Identifiable, Equatable, Hashable {
             let (data, _) = try await URLSession.shared.data(from: url)
             let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
 
-            guard let json = json else {
+            guard let json else {
                 throw FetchError.invalidResponse
             }
 
@@ -241,7 +241,7 @@ class ElgatoDevice: ObservableObject, Identifiable, Equatable, Hashable {
     }
 
     private func internalFromKelvin(_ kelvin: Int) -> Int {
-        return Int(round(987_007 * pow(Double(kelvin), -0.999)))
+        Int(round(987_007 * pow(Double(kelvin), -0.999)))
     }
 
     private func kelvinFromInternal(_ internal: Int) -> Int {

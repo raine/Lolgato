@@ -77,7 +77,7 @@ class LightSystemStateController {
     }
 
     deinit {
-        if let screenLockMonitor = screenLockMonitor {
+        if let screenLockMonitor {
             DistributedNotificationCenter.default().removeObserver(screenLockMonitor)
         }
     }
@@ -88,14 +88,13 @@ class LightSystemStateController {
 
     @objc private func handleSystemStateChange(notification: Notification) {
         guard appState.lightsOffOnSleep else { return }
-        let reason: String
-        switch notification.name {
+        let reason = switch notification.name {
         case NSWorkspace.willSleepNotification:
-            reason = "computer sleep"
+            "computer sleep"
         case NSWorkspace.screensDidSleepNotification:
-            reason = "screen sleep"
+            "screen sleep"
         default:
-            reason = "unknown reason"
+            "unknown reason"
         }
         logger.info("System state changed due to \(reason, privacy: .public). Turning off lights.")
         turnOffAllLights(reason: reason)
@@ -151,14 +150,13 @@ class LightSystemStateController {
         guard appState.lightsOffOnSleep else { return }
         guard lightsWereTurnedOff else { return }
 
-        let reason: String
-        switch notification.name {
+        let reason = switch notification.name {
         case NSWorkspace.didWakeNotification:
-            reason = "computer wake"
+            "computer wake"
         case NSWorkspace.screensDidWakeNotification:
-            reason = "screen wake"
+            "screen wake"
         default:
-            reason = "unknown reason"
+            "unknown reason"
         }
 
         logger.info("System waking up due to \(reason, privacy: .public). Turning on lights.")

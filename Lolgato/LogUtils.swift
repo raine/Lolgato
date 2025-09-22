@@ -15,7 +15,7 @@ func writeLogsToTemp() -> URL? {
         }
         .joined(separator: "\n")
 
-    guard let entries = entries else {
+    guard let entries else {
         return nil
     }
 

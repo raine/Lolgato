@@ -87,8 +87,8 @@ class AppCoordinator: ObservableObject {
             Task { @MainActor in
                 guard let deviceManager = self?.deviceManager else { return }
                 let currentBrightness = deviceManager.devices
-                    .filter { $0.isOnline }
-                    .map { $0.brightness }
+                    .filter(\.isOnline)
+                    .map(\.brightness)
                     .max() ?? 0
                 let newBrightness = min(currentBrightness + 10, 100)
                 await deviceManager.setAllLightsBrightness(newBrightness)
@@ -99,8 +99,8 @@ class AppCoordinator: ObservableObject {
             Task { @MainActor in
                 guard let deviceManager = self?.deviceManager else { return }
                 let currentBrightness = deviceManager.devices
-                    .filter { $0.isOnline }
-                    .map { $0.brightness }
+                    .filter(\.isOnline)
+                    .map(\.brightness)
                     .max() ?? 0
                 let newBrightness = max(currentBrightness - 10, 0)
                 await deviceManager.setAllLightsBrightness(newBrightness)
@@ -111,8 +111,8 @@ class AppCoordinator: ObservableObject {
             Task { @MainActor in
                 guard let deviceManager = self?.deviceManager else { return }
                 let currentTemp = deviceManager.devices
-                    .filter { $0.isOnline }
-                    .map { $0.temperature }
+                    .filter(\.isOnline)
+                    .map(\.temperature)
                     .max() ?? 4000
                 let newTemp = min(currentTemp + 500, 7000)
                 await deviceManager.setAllLightsTemperature(newTemp)
@@ -123,8 +123,8 @@ class AppCoordinator: ObservableObject {
             Task { @MainActor in
                 guard let deviceManager = self?.deviceManager else { return }
                 let currentTemp = deviceManager.devices
-                    .filter { $0.isOnline }
-                    .map { $0.temperature }
+                    .filter(\.isOnline)
+                    .map(\.temperature)
                     .max() ?? 4000
                 let newTemp = max(currentTemp - 500, 2900)
                 await deviceManager.setAllLightsTemperature(newTemp)

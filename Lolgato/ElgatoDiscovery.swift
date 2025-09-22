@@ -10,11 +10,11 @@ enum ElgatoDiscoveryEvent {
     var debugDescription: String {
         switch self {
         case let .deviceFound(endpoint):
-            return "Device found: \(endpoint.debugDescription)"
+            "Device found: \(endpoint.debugDescription)"
         case let .deviceLost(endpoint):
-            return "Device lost: \(endpoint.debugDescription)"
+            "Device lost: \(endpoint.debugDescription)"
         case let .error(error):
-            return "Error: \(error.localizedDescription)"
+            "Error: \(error.localizedDescription)"
         }
     }
 }
@@ -51,28 +51,28 @@ class ElgatoDiscovery: AsyncSequence {
         browser = NWBrowser(for: browserDescriptor, using: parameters)
 
         browser?.stateUpdateHandler = { [weak self] state in
-            guard let self = self else { return }
+            guard let self else { return }
             switch state {
             case .ready:
-                self.logger.info("Browser is ready")
+                logger.info("Browser is ready")
             case let .failed(error):
-                self.logger
+                logger
                     .error("Browser failed with error: \(error.localizedDescription, privacy: .public)")
-                self.continuation?.yield(.error(error))
+                continuation?.yield(.error(error))
             case .cancelled:
-                self.logger.info("Browser was cancelled")
-                self.continuation?.finish()
+                logger.info("Browser was cancelled")
+                continuation?.finish()
             case .setup:
-                self.logger.debug("Browser is setting up")
+                logger.debug("Browser is setting up")
             case .waiting:
-                self.logger.debug("Browser is waiting")
+                logger.debug("Browser is waiting")
             @unknown default:
-                self.logger.warning("Browser entered an unknown state")
+                logger.warning("Browser entered an unknown state")
             }
         }
 
         browser?.browseResultsChangedHandler = { [weak self] _, changes in
-            guard let self = self else { return }
+            guard let self else { return }
 
             for change in changes {
                 switch change {
@@ -86,28 +86,28 @@ class ElgatoDiscovery: AsyncSequence {
                         }
                     }
                 case let .removed(result):
-                    if self.discoveredEndpoints.contains(result.endpoint) {
-                        self.discoveredEndpoints.remove(result.endpoint)
-                        self.continuation?.yield(.deviceLost(result.endpoint))
+                    if discoveredEndpoints.contains(result.endpoint) {
+                        discoveredEndpoints.remove(result.endpoint)
+                        continuation?.yield(.deviceLost(result.endpoint))
                     }
                 case .identical:
                     // No action needed for identical results
                     break
                 case let .changed(old: old, new: new, flags: _):
-                    if self.discoveredEndpoints.contains(old.endpoint) {
-                        self.discoveredEndpoints.remove(old.endpoint)
-                        self.discoveredEndpoints.insert(new.endpoint)
+                    if discoveredEndpoints.contains(old.endpoint) {
+                        discoveredEndpoints.remove(old.endpoint)
+                        discoveredEndpoints.insert(new.endpoint)
 
-                        self.continuation?.yield(.deviceLost(old.endpoint))
-                        self.continuation?.yield(.deviceFound(new.endpoint))
+                        continuation?.yield(.deviceLost(old.endpoint))
+                        continuation?.yield(.deviceFound(new.endpoint))
 
-                        self.logger
+                        logger
                             .info(
                                 "Device changed: \(old.endpoint.debugDescription) -> \(new.endpoint.debugDescription)"
                             )
                     }
                 @unknown default:
-                    self.logger.warning("Unknown change type in browse results")
+                    logger.warning("Unknown change type in browse results")
                 }
             }
         }
@@ -126,36 +126,36 @@ class ElgatoDiscovery: AsyncSequence {
 
             let connection = NWConnection(to: endpoint, using: parameters)
             connection.stateUpdateHandler = { [weak self] state in
-                guard let self = self else { return }
+                guard let self else { return }
                 switch state {
                 case .ready:
                     if let resolvedEndpoint = connection.currentPath?.remoteEndpoint {
                         logEndpointType(resolvedEndpoint, logger: logger)
-                        self.logger
+                        logger
                             .info("Resolved endpoint: \(resolvedEndpoint.debugDescription, privacy: .public)")
 
                         continuation.resume(returning: resolvedEndpoint)
                     } else {
-                        self.logger.warning("Could not resolve endpoint")
+                        logger.warning("Could not resolve endpoint")
                         continuation.resume(returning: nil)
                     }
                     connection.cancel()
                 case let .failed(error):
-                    self.logger
+                    logger
                         .error(
                             "Connection failed with error: \(error.localizedDescription, privacy: .public)"
                         )
                     continuation.resume(returning: nil)
                 case .cancelled:
-                    self.logger.info("Connection was cancelled")
+                    logger.info("Connection was cancelled")
                 case .setup:
-                    self.logger.info("Connection is in setup state")
+                    logger.info("Connection is in setup state")
                 case .preparing:
-                    self.logger.info("Connection is in preparing state")
+                    logger.info("Connection is in preparing state")
                 case .waiting:
-                    self.logger.info("Connection is in waiting state")
+                    logger.info("Connection is in waiting state")
                 @unknown default:
-                    self.logger.warning("Connection entered an unknown state")
+                    logger.warning("Connection entered an unknown state")
                 }
             }
             connection.start(queue: .main)
