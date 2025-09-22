@@ -20,14 +20,5 @@ if [[ ! -d "$project_name" ]]; then
 	exit 1
 fi
 
-echo "Building $scheme_name scheme in $configuration configuration..."
-
-# Run xcodebuild with error capture
-if xcodebuild -project "$project_name" -scheme "$scheme_name" -configuration "$configuration" build 2>&1; then
-	echo "Build completed successfully"
-	exit 0
-else
-	build_exit_code=$?
-	echo "Build failed with exit code $build_exit_code" >&2
-	exit $build_exit_code
-fi
+# Run xcodebuild
+xcodebuild -project "$project_name" -scheme "$scheme_name" -configuration "$configuration" build -quiet
