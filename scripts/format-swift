@@ -1,0 +1,141 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# Script to format Swift files using swiftformat
+# Recursively finds and formats all .swift files in the project
+# Automatically detects Swift version to enable all formatting features
+
+show_help() {
+	cat <<EOF
+Usage: $(basename "$0") [DIRECTORY]
+
+Format all Swift files in the project using swiftformat.
+
+Arguments:
+  DIRECTORY    Directory to search for Swift files (default: current directory)
+
+Options:
+  -h, --help   Show this help message
+
+This script will:
+  1. Check if swiftformat is installed
+  2. Find all .swift files recursively in the specified directory
+  3. Format each file using swiftformat
+  4. Show a summary of the formatting results
+
+EOF
+}
+
+detect_swift_version() {
+	local swift_version
+
+	# Try to get Swift version from swift --version command
+	if swift_version=$(swift --version 2>/dev/null); then
+		# Extract version number from output like "swift-driver version: 1.87.3 Apple Swift version 5.9.2"
+		# or "Apple Swift version 5.9.2 (swiftlang-5.9.2.2.56 clang-1500.1.0.2.5)"
+		local version_number
+		if version_number=$(echo "$swift_version" | grep -oE "Swift version [0-9]+\.[0-9]+(\.[0-9]+)?" | grep -oE "[0-9]+\.[0-9]+(\.[0-9]+)?"); then
+			echo "$version_number"
+			return 0
+		elif version_number=$(echo "$swift_version" | grep -oE "[0-9]+\.[0-9]+(\.[0-9]+)?" | head -n1); then
+			echo "$version_number"
+			return 0
+		fi
+	fi
+
+	# If detection fails, return empty string
+	echo ""
+	return 1
+}
+
+main() {
+	# Handle help option
+	if [[ "${1:-}" == "-h" ]] || [[ "${1:-}" == "--help" ]]; then
+		show_help
+		exit 0
+	fi
+
+	local project_dir="${1:-$(pwd)}"
+	local swift_files=()
+	local formatted_count=0
+	local swift_version
+	local swift_version_arg=""
+
+	# Validate directory exists
+	if [[ ! -d "$project_dir" ]]; then
+		echo "Error: Directory '$project_dir' does not exist"
+		exit 1
+	fi
+
+	echo "Formatting Swift files in: $project_dir"
+
+	# Detect Swift version
+	echo "Detecting Swift version..."
+	if swift_version=$(detect_swift_version); then
+		if [[ -n "$swift_version" ]]; then
+			echo "Detected Swift version: $swift_version"
+			swift_version_arg="--swiftversion $swift_version"
+		else
+			echo "Warning: Could not detect Swift version. Some formatting features may be disabled."
+		fi
+	else
+		echo "Warning: Swift version detection failed. Some formatting features may be disabled."
+	fi
+	echo
+
+	# Check if swiftformat is installed
+	if ! command -v swiftformat &>/dev/null; then
+		echo "Error: swiftformat is not installed or not in PATH"
+		echo
+		echo "To install swiftformat:"
+		echo "  • Using Homebrew: brew install swiftformat"
+		echo "  • Using Mint: mint install nicklockwood/SwiftFormat"
+		echo "  • Download from: https://github.com/nicklockwood/SwiftFormat"
+		echo
+		exit 1
+	fi
+
+	# Find all Swift files recursively
+	echo "Finding Swift files..."
+	while IFS= read -r -d '' file; do
+		swift_files+=("$file")
+	done < <(find "$project_dir" -name "*.swift" -type f -print0)
+
+	if [ ${#swift_files[@]} -eq 0 ]; then
+		echo "No Swift files found in $project_dir"
+		exit 0
+	fi
+
+	echo "Found ${#swift_files[@]} Swift file(s)"
+	echo
+
+	# Format each Swift file
+	for file in "${swift_files[@]}"; do
+		echo "Formatting: $file"
+		# Use eval to properly handle the swift_version_arg which may be empty
+		if eval "swiftformat --quiet $swift_version_arg \"$file\"" 2>/dev/null; then
+			formatted_count=$((formatted_count + 1))
+		else
+			echo "Warning: Failed to format $file"
+			# Show error details on failure
+			eval "swiftformat $swift_version_arg \"$file\"" || true
+		fi
+	done
+
+	echo
+	echo "Successfully formatted $formatted_count out of ${#swift_files[@]} Swift files"
+
+	# Show git status if in a git repository
+	if git rev-parse --git-dir &>/dev/null; then
+		echo
+		echo "Git status after formatting:"
+		git status --porcelain "*.swift" || true
+	fi
+
+	# Ensure script exits with success
+	exit 0
+}
+
+# Run main function with all arguments
+main "$@"
