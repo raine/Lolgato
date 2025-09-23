@@ -123,6 +123,12 @@ class AppCoordinator: ObservableObject {
         KeyboardShortcuts.onKeyUp(for: .increaseTemperature) { [weak self] in
             Task { @MainActor in
                 guard let deviceManager = self?.deviceManager else { return }
+
+                // Disable night shift sync when manually adjusting temperature
+                if let self, self.appState.syncWithNightShift {
+                    self.appState.syncWithNightShift = false
+                }
+
                 let currentTemp = deviceManager.devices
                     .filter(\.isOnline)
                     .map(\.temperature)
@@ -135,6 +141,12 @@ class AppCoordinator: ObservableObject {
         KeyboardShortcuts.onKeyUp(for: .decreaseTemperature) { [weak self] in
             Task { @MainActor in
                 guard let deviceManager = self?.deviceManager else { return }
+
+                // Disable night shift sync when manually adjusting temperature
+                if let self, self.appState.syncWithNightShift {
+                    self.appState.syncWithNightShift = false
+                }
+
                 let currentTemp = deviceManager.devices
                     .filter(\.isOnline)
                     .map(\.temperature)
