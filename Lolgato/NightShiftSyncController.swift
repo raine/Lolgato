@@ -22,6 +22,8 @@ class NightShiftSyncController {
     private var lastSyncedTemperature: Int = 0
     private var frameworkHandle: UnsafeMutableRawPointer?
     private var syncTimer: Timer?
+    private var lastNightShiftState: (enabled: Bool, active: Bool) = (false, false)
+    private var lastStrength: Float = -1.0  // Track strength changes
 
     init(deviceManager: ElgatoDeviceManager, appState: AppState) {
         self.deviceManager = deviceManager
@@ -143,11 +145,14 @@ class NightShiftSyncController {
         let _ = statusPtr.load(fromByteOffset: 2, as: Bool.self) // sunSchedulePermitted - not used
         let mode = statusPtr.load(fromByteOffset: 4, as: Int32.self)
 
-        // For now, we'll check if it's enabled and active
-        logger.info("Night Shift - Active: \(active), Enabled: \(enabled), Mode: \(mode)")
+        // Only log when Night Shift state changes (avoid spam)
+        let currentState = (enabled: enabled, active: active)
+        if currentState.enabled != lastNightShiftState.enabled || currentState.active != lastNightShiftState.active {
+            logger.info("Night Shift state changed - Active: \(active), Enabled: \(enabled), Mode: \(mode)")
+            lastNightShiftState = currentState
+        }
 
         if !enabled || !active {
-            logger.info("Night Shift is not active. Reverting to default temperature.")
             // When Night Shift is disabled, revert to a neutral temperature
             let defaultTemperature = 6500 // Neutral daylight temperature
             if lastSyncedTemperature != defaultTemperature {
@@ -176,11 +181,15 @@ class NightShiftSyncController {
             // Call the function directly with pointer to strength
             let success = getStrength(client, getStrengthSelector, &strength)
 
-            if success {
-                logger.info("Night Shift strength: \(strength)")
-            } else {
+            if !success {
                 logger.warning("getStrength: returned false, using default strength")
                 strength = 0.5 // Default to medium warmth
+            } else {
+                // Log when strength actually changes
+                if abs(strength - self.lastStrength) > 0.01 {  // Only log if change is significant
+                    logger.info("Night Shift strength changed: \(self.lastStrength) → \(strength)")
+                    self.lastStrength = strength
+                }
             }
         } else {
             logger.warning("getStrength: method not found, using default strength")
