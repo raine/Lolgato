@@ -23,14 +23,12 @@ class NightShiftSyncController {
     private var frameworkHandle: UnsafeMutableRawPointer?
     private var syncTimer: Timer?
     private var lastNightShiftState: (enabled: Bool, active: Bool) = (false, false)
-    private var lastStrength: Float = -1.0  // Track strength changes
+    private var lastStrength: Float = -1.0 // Track strength changes, init with invalid value
+    private var stuckStrengthCounter: Int = 0 // Counter for stuck strength detection
 
     init(deviceManager: ElgatoDeviceManager, appState: AppState) {
         self.deviceManager = deviceManager
         self.appState = appState
-
-        // Dynamically load CoreBrightness framework
-        loadCoreBrightnessFramework()
 
         setupSubscriptions()
 
@@ -41,24 +39,34 @@ class NightShiftSyncController {
         }
     }
 
-    private func loadCoreBrightnessFramework() {
-        let frameworkPath = "/System/Library/PrivateFrameworks/CoreBrightness.framework/CoreBrightness"
-        frameworkHandle = dlopen(frameworkPath, RTLD_NOW)
+    private func getBlueLightClient() -> AnyObject? {
+        if let client = blueLightClient {
+            return client
+        }
 
         if frameworkHandle == nil {
-            logger.error("Failed to load CoreBrightness framework")
-            return
+            let frameworkPath = "/System/Library/PrivateFrameworks/CoreBrightness.framework/CoreBrightness"
+            frameworkHandle = dlopen(frameworkPath, RTLD_NOW)
+            if frameworkHandle == nil {
+                logger.error("Failed to load CoreBrightness framework")
+                return nil
+            }
         }
 
-        // Get the CBBlueLightClient class dynamically
         guard let clientClass = NSClassFromString("CBBlueLightClient") as? NSObject.Type else {
             logger.error("Failed to find CBBlueLightClient class")
-            return
+            return nil
         }
 
-        // Create an instance
-        blueLightClient = clientClass.init()
-        logger.info("Successfully loaded CoreBrightness framework and created CBBlueLightClient")
+        let client = clientClass.init()
+        blueLightClient = client
+        logger.info("Successfully loaded CoreBrightness and created CBBlueLightClient instance.")
+        return client
+    }
+
+    private func invalidateBlueLightClient() {
+        blueLightClient = nil
+        logger.info("Invalidated CBBlueLightClient instance. It will be recreated on the next poll.")
     }
 
     private func setupSubscriptions() {
@@ -77,15 +85,10 @@ class NightShiftSyncController {
 
     private func startPeriodicSync() {
         guard appState.syncWithNightShift else { return }
-
-        // Stop existing timer if any
         stopPeriodicSync()
-
-        // Check every second for immediate Night Shift syncing
         syncTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
             self?.updateLightTemperatureForNightShift()
         }
-
         logger.info("Started periodic Night Shift sync (every 1 second)")
     }
 
@@ -96,7 +99,7 @@ class NightShiftSyncController {
     }
 
     private func updateLightTemperatureForNightShift() {
-        guard let client = blueLightClient else {
+        guard let client = getBlueLightClient() else {
             logger.warning("CBBlueLightClient is not available.")
             return
         }
@@ -113,19 +116,25 @@ class NightShiftSyncController {
         //   - disableFlags: UInt64 (8 bytes)
         // Total: 32 bytes (but we'll allocate extra for safety)
         let statusSize = 48
-        let statusPtr = UnsafeMutableRawPointer.allocate(byteCount: statusSize, alignment: MemoryLayout<Int>.alignment)
+        let statusPtr = UnsafeMutableRawPointer.allocate(
+            byteCount: statusSize,
+            alignment: MemoryLayout<Int>.alignment
+        )
         defer { statusPtr.deallocate() }
         statusPtr.initializeMemory(as: UInt8.self, repeating: 0, count: statusSize)
 
         let selector = NSSelectorFromString("getBlueLightStatus:")
         guard client.responds(to: selector) else {
-            logger.error("getBlueLightStatus: method not found")
+            logger.error("getBlueLightStatus: method not found. Invalidating client.")
+            invalidateBlueLightClient()
             return
         }
 
-        // To call a method that expects a C struct pointer, we must get its C-style function implementation (IMP).
+        // To call a method that expects a C struct pointer, we must get its C-style function implementation
+        // (IMP).
         guard let methodIMP = client.method(for: selector) else {
-            logger.error("Could not get IMP for getBlueLightStatus:")
+            logger.error("Could not get IMP for getBlueLightStatus:. Invalidating client.")
+            invalidateBlueLightClient()
             return
         }
 
@@ -135,25 +144,29 @@ class NightShiftSyncController {
 
         // Call the function with the pointer to our memory.
         guard getStatus(client, selector, statusPtr) else {
-            logger.error("Failed to get Night Shift status (method returned false).")
+            logger.error("Failed to get Night Shift status (method returned false). Invalidating client.")
+            invalidateBlueLightClient()
             return
         }
 
         // Read the data from the pointer using the correct layout and offsets.
         let active = statusPtr.load(as: Bool.self)
         let enabled = statusPtr.load(fromByteOffset: 1, as: Bool.self)
-        let _ = statusPtr.load(fromByteOffset: 2, as: Bool.self) // sunSchedulePermitted - not used
+        _ = statusPtr.load(fromByteOffset: 2, as: Bool.self) // sunSchedulePermitted - not used
         let mode = statusPtr.load(fromByteOffset: 4, as: Int32.self)
 
         // Only log when Night Shift state changes (avoid spam)
         let currentState = (enabled: enabled, active: active)
-        if currentState.enabled != lastNightShiftState.enabled || currentState.active != lastNightShiftState.active {
+        if currentState.enabled != lastNightShiftState.enabled || currentState.active != lastNightShiftState
+            .active
+        {
             logger.info("Night Shift state changed - Active: \(active), Enabled: \(enabled), Mode: \(mode)")
             lastNightShiftState = currentState
         }
 
         if !enabled || !active {
             // When Night Shift is disabled, revert to a neutral temperature
+            stuckStrengthCounter = 0 // Reset counter when not active
             let defaultTemperature = 6500 // Neutral daylight temperature
             if lastSyncedTemperature != defaultTemperature {
                 lastSyncedTemperature = defaultTemperature
@@ -170,36 +183,66 @@ class NightShiftSyncController {
 
         if client.responds(to: getStrengthSelector) {
             guard let methodIMP = client.method(for: getStrengthSelector) else {
-                logger.error("Could not get IMP for getStrength:")
+                logger.error("Could not get IMP for getStrength:. Invalidating client.")
+                invalidateBlueLightClient()
                 return
             }
 
             // Define the function signature for getStrength: - (BOOL)getStrength:(float*)strength;
-            typealias GetStrengthFunc = @convention(c) (AnyObject, Selector, UnsafeMutablePointer<Float>) -> Bool
+            typealias GetStrengthFunc = @convention(c) (AnyObject, Selector, UnsafeMutablePointer<Float>)
+                -> Bool
             let getStrength = unsafeBitCast(methodIMP, to: GetStrengthFunc.self)
 
             // Call the function directly with pointer to strength
             let success = getStrength(client, getStrengthSelector, &strength)
 
             if !success {
-                logger.warning("getStrength: returned false, using default strength")
-                strength = 0.5 // Default to medium warmth
+                logger
+                    .warning(
+                        "getStrength: returned false. Invalidating client and reusing last known strength."
+                    )
+                invalidateBlueLightClient()
+                // On failure, reuse the last known good strength to prevent jumps.
+                if lastStrength >= 0.0 {
+                    strength = lastStrength
+                } else {
+                    strength = 0.5 // Fallback for the very first run
+                }
             } else {
-                // Log when strength actually changes
-                if abs(strength - self.lastStrength) > 0.01 {  // Only log if change is significant
+                // Log when strength actually changes and check for stuck values
+                if abs(strength - lastStrength) > 0.01 { // Only log if change is significant
                     logger.info("Night Shift strength changed: \(self.lastStrength) → \(strength)")
-                    self.lastStrength = strength
+                    lastStrength = strength
+                    stuckStrengthCounter = 0 // Reset counter on change
+                } else {
+                    // Strength is unchanged. Check if it's the potentially stuck value.
+                    if strength == 1.0 {
+                        stuckStrengthCounter += 1
+                    } else {
+                        stuckStrengthCounter = 0 // Reset if it's not the stuck value
+                    }
+                }
+
+                // Proactive recovery for stuck value
+                if stuckStrengthCounter > 30 {
+                    logger
+                        .warning(
+                            "Strength value has been 1.0 for 30+ seconds. Proactively invalidating client."
+                        )
+                    invalidateBlueLightClient()
+                    stuckStrengthCounter = 0 // Reset after invalidating
                 }
             }
         } else {
-            logger.warning("getStrength: method not found, using default strength")
-            strength = 0.5 // Default to medium warmth
+            logger.warning("getStrength: method not found. Invalidating client.")
+            invalidateBlueLightClient()
+            return
         }
 
         // Map strength (0.0-1.0) to color temperature
         // 0.0 = least warm (6500K), 1.0 = most warm (2900K - Elgato's warmest)
-        let minTemp = 2900  // Warmest possible on Elgato
-        let maxTemp = 6500  // Cool/neutral white
+        let minTemp = 2900 // Warmest possible on Elgato
+        let maxTemp = 6500 // Cool/neutral white
         let nightShiftKelvin = Int(Float(maxTemp) - (strength * Float(maxTemp - minTemp)))
 
         // Clamp the temperature to the range supported by Elgato devices
@@ -207,7 +250,10 @@ class NightShiftSyncController {
 
         // Only update if the temperature has changed (avoid unnecessary updates)
         if lastSyncedTemperature != elgatoKelvin {
-            logger.info("Night Shift temperature changed: \(nightShiftKelvin)K (strength: \(strength)) → Elgato: \(elgatoKelvin)K")
+            logger
+                .info(
+                    "Night Shift temperature changed: \(nightShiftKelvin)K (strength: \(strength)) → Elgato: \(elgatoKelvin)K"
+                )
             lastSyncedTemperature = elgatoKelvin
             Task { @MainActor in
                 await deviceManager.setAllLightsTemperature(elgatoKelvin)
