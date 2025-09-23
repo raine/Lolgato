@@ -37,6 +37,7 @@ struct LolgatoMenu: View {
 
             Toggle("Lights on with Camera", isOn: $appState.lightsOnWithCamera)
             Toggle("Lights off on Sleep", isOn: $appState.lightsOffOnSleep)
+            Toggle("Sync with Night Shift", isOn: $appState.syncWithNightShift)
 
             Divider()
 
