@@ -14,8 +14,10 @@ the standard Elgato Control Center software.
 
 - Automatically turn lights on and off based on camera activity
 - Turn lights off when locking your Mac
+- Sync light temperature with macOS Night Shift
 - Global keyboard shortcuts:
   - Toggle lights on and off
+  - Toggle Night Shift synchronization
   - Increase and decrease brightness of all lights
   - Increase and decrease temperature of all lights
 
@@ -57,6 +59,14 @@ certain settings.
 
 The app uses macOS system APIs to detect camera activity across different
 applications.
+
+#### How does Night Shift sync work?
+
+The app can automatically adjust your Elgato light temperature to match macOS
+Night Shift settings. When Night Shift is active, lights become warmer (more
+yellow/orange). When disabled, lights return to neutral daylight temperature
+(6500K). This creates a consistent lighting environment that matches your
+screen's color temperature.
 
 #### What if my devices aren't automatically discovered?
 
