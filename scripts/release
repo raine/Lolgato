@@ -9,6 +9,13 @@ dmg_path="build/Lolgato.dmg"
 app_path="build/Lolgato.app"
 version=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$app_path/Contents/Info.plist")
 
+# Update README with current version
+sed -i '' "s/Latest release v[0-9]\+\.[0-9]\+\.[0-9]\+:/Latest release v$version:/" README.md
+
+# Commit README update
+git add README.md
+git commit -m "bump version in README to v$version"
+
 git tag "v$version"
 git push --tags origin "v$version"
 
