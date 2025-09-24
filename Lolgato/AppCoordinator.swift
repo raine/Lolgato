@@ -155,5 +155,18 @@ class AppCoordinator: ObservableObject {
                 await deviceManager.setAllLightsTemperature(newTemp)
             }
         }
+
+        KeyboardShortcuts.onKeyUp(for: .toggleNightShiftSync) { [weak self] in
+            Task { @MainActor in
+                guard let self else { return }
+
+                // Toggle the Night Shift sync state
+                self.appState.syncWithNightShift.toggle()
+
+                // Log the change
+                let newState = self.appState.syncWithNightShift ? "enabled" : "disabled"
+                self.logger.info("Night Shift sync \(newState) via keyboard shortcut")
+            }
+        }
     }
 }

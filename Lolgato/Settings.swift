@@ -29,7 +29,7 @@ struct SettingsView: View {
                 }
         }
         .padding(20)
-        .frame(width: 600, height: 450)
+        .frame(width: 600, height: 480)
     }
 }
 
@@ -87,6 +87,12 @@ struct KeyboardShortcutsView: View {
                 caption: "Toggle lights on/off."
             )
 
+            shortcutRow(
+                label: "Toggle Night Shift Sync:",
+                shortcut: .toggleNightShiftSync,
+                caption: "Toggle synchronization with macOS Night Shift."
+            )
+
             Divider()
 
             shortcutRow(
@@ -115,7 +121,6 @@ struct KeyboardShortcutsView: View {
                 caption: "Make lights warmer (more yellow)."
             )
 
-            Spacer()
             Divider()
             ResetButton(action: resetToDefaults)
         }
@@ -136,6 +141,7 @@ struct KeyboardShortcutsView: View {
         KeyboardShortcuts.reset(.decreaseBrightness)
         KeyboardShortcuts.reset(.increaseTemperature)
         KeyboardShortcuts.reset(.decreaseTemperature)
+        KeyboardShortcuts.reset(.toggleNightShiftSync)
     }
 }
 

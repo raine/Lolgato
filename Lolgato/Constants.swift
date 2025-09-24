@@ -6,4 +6,5 @@ extension KeyboardShortcuts.Name {
     static let decreaseBrightness = Self("decreaseBrightness")
     static let increaseTemperature = Self("increaseTemperature")
     static let decreaseTemperature = Self("decreaseTemperature")
+    static let toggleNightShiftSync = Self("toggleNightShiftSync")
 }
