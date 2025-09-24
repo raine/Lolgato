@@ -29,7 +29,7 @@ Requires macOS 14 or later.
 
 ## Screenshots
 
-![Demo](Meta/demo.gif) ![Menu](Meta/Menu_readme.png)
+![Demo](Meta/demo.gif) ![Menu](Meta/Menu_readme_v1_6_0.png)
 
 ## How to Use
 
