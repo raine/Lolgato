@@ -24,7 +24,6 @@ class NightShiftSyncController {
     private var syncTimer: Timer?
     private var lastNightShiftState: (enabled: Bool, active: Bool) = (false, false)
     private var lastStrength: Float = -1.0 // Track strength changes, init with invalid value
-    private var stuckStrengthCounter: Int = 0 // Counter for stuck strength detection
 
     init(deviceManager: ElgatoDeviceManager, appState: AppState) {
         self.deviceManager = deviceManager
@@ -184,7 +183,6 @@ class NightShiftSyncController {
 
         if !enabled || !active {
             // When Night Shift is disabled, revert to a neutral temperature
-            stuckStrengthCounter = 0 // Reset counter when not active
             let defaultTemperature = 6500 // Neutral daylight temperature
             if lastSyncedTemperature != defaultTemperature {
                 lastSyncedTemperature = defaultTemperature
@@ -228,36 +226,12 @@ class NightShiftSyncController {
                 }
             } else {
                 // Always log current strength for debugging
-                logger
-                    .debug(
-                        "Current strength: \(strength), last: \(self.lastStrength), stuck counter: \(self.stuckStrengthCounter)"
-                    )
+                logger.debug("Current strength: \(strength), last: \(self.lastStrength)")
 
-                // Log when strength actually changes and check for stuck values
+                // Log when strength actually changes
                 if abs(strength - lastStrength) > 0.01 { // Only log if change is significant
                     logger.info("Night Shift strength changed: \(self.lastStrength) → \(strength)")
                     lastStrength = strength
-                    stuckStrengthCounter = 0 // Reset counter on change
-                } else {
-                    // Strength is unchanged. Check if it's the potentially stuck value.
-                    if strength == 1.0 {
-                        stuckStrengthCounter += 1
-                        if stuckStrengthCounter % 10 == 0 { // Log every 10 seconds when stuck at 1.0
-                            logger.debug("Strength stuck at 1.0 for \(self.stuckStrengthCounter) seconds")
-                        }
-                    } else {
-                        stuckStrengthCounter = 0 // Reset if it's not the stuck value
-                    }
-                }
-
-                // Proactive recovery for stuck value
-                if stuckStrengthCounter > 120 { // Increased from 30 to 120 seconds (2 minutes)
-                    logger
-                        .warning(
-                            "Strength value has been 1.0 for 120+ seconds. Proactively invalidating client."
-                        )
-                    invalidateBlueLightClient()
-                    stuckStrengthCounter = 0 // Reset after invalidating
                 }
             }
         } else {
