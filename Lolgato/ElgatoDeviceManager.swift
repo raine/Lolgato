@@ -58,7 +58,7 @@ class ElgatoDevice: ObservableObject, Identifiable, Equatable, Hashable {
     @Published var temperature: Int = 4000 // Temperature in Kelvin
     @Published var isManaged: Bool = true // Whether this device is controlled by the app
     private var internalTemp: Int = 244 // Internal Elgato scale (143-344)
-    var macAddress: String
+    @Published var macAddress: String
 
     var id: NWEndpoint { endpoint }
 
@@ -349,6 +349,7 @@ class ElgatoDeviceManager: ObservableObject {
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "ElgatoDeviceManager")
     private var discoveryTask: Task<Void, Never>?
     let newDeviceDiscovered = PassthroughSubject<ElgatoDevice, Never>()
+    private var deviceCancellables = Set<AnyCancellable>()
 
     init(discovery: ElgatoDiscovery) {
         self.discovery = discovery
@@ -411,6 +412,7 @@ class ElgatoDeviceManager: ObservableObject {
 
             logger.info("New device found: \(endpoint.debugDescription, privacy: .public)")
             devices.append(newDevice)
+            resubscribeToDeviceChanges()
 
             newDeviceDiscovered.send(newDevice)
 
@@ -456,7 +458,11 @@ class ElgatoDeviceManager: ObservableObject {
     @MainActor
     func removeStaleDevices() {
         let removalThreshold = Date().addingTimeInterval(-24 * 60 * 60)
+        let initialCount = devices.count
         devices.removeAll { $0.lastSeen < removalThreshold }
+        if devices.count != initialCount {
+            resubscribeToDeviceChanges()
+        }
         objectWillChange.send()
     }
 
@@ -632,6 +638,7 @@ class ElgatoDeviceManager: ObservableObject {
 
             logger.info("Found \(storedDevices.count) stored devices")
 
+            var newDevicesAdded = false
             for storedDevice in storedDevices {
                 // Create a new device for each stored entry
                 let host = NWEndpoint.Host(storedDevice.ipAddress)
@@ -655,6 +662,7 @@ class ElgatoDeviceManager: ObservableObject {
                 }
 
                 devices.append(newDevice)
+                newDevicesAdded = true
 
                 // Try to fetch the device state
                 Task {
@@ -674,6 +682,10 @@ class ElgatoDeviceManager: ObservableObject {
                     }
                 }
             }
+
+            if newDevicesAdded {
+                resubscribeToDeviceChanges()
+            }
         } catch {
             logger.error("Failed to load stored devices: \(error.localizedDescription, privacy: .public)")
         }
@@ -687,6 +699,7 @@ class ElgatoDeviceManager: ObservableObject {
 
         if let index = devices.firstIndex(where: { $0.endpoint == device.endpoint }) {
             devices.remove(at: index)
+            resubscribeToDeviceChanges()
             saveDevicesToPersistentStorage()
             objectWillChange.send()
             logger.info("Device removed: \(device.name, privacy: .public)")
@@ -721,6 +734,7 @@ class ElgatoDeviceManager: ObservableObject {
         let newDevice = ElgatoDevice(endpoint: endpoint)
         newDevice.isOnline = false
         devices.append(newDevice)
+        resubscribeToDeviceChanges()
 
         Task {
             do {
@@ -798,5 +812,17 @@ class ElgatoDeviceManager: ObservableObject {
 
         // Compare hosts ignoring case
         return hostStr1.lowercased() == hostStr2.lowercased()
+    }
+
+    private func resubscribeToDeviceChanges() {
+        deviceCancellables.removeAll()
+        for device in devices {
+            device.objectWillChange
+                .receive(on: RunLoop.main)
+                .sink { [weak self] _ in
+                    self?.objectWillChange.send()
+                }
+                .store(in: &deviceCancellables)
+        }
     }
 }
