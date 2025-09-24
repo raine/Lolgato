@@ -66,30 +66,48 @@ class NightShiftSyncController {
 
     private func invalidateBlueLightClient() {
         blueLightClient = nil
-        logger.info("Invalidated CBBlueLightClient instance. It will be recreated on the next poll.")
+        logger.warning("🔄 Invalidated CBBlueLightClient instance. It will be recreated on the next poll.")
     }
 
     private func setupSubscriptions() {
         appState.$syncWithNightShift
             .sink { [weak self] enabled in
                 self?.logger.info("Night Shift sync setting changed to: \(enabled, privacy: .public)")
-                if enabled {
-                    self?.startPeriodicSync()
-                    self?.updateLightTemperatureForNightShift()
-                } else {
-                    self?.stopPeriodicSync()
-                }
+                // Delegate to a handler that uses the value from the subscription
+                self?.syncStateDidChange(to: enabled)
             }
             .store(in: &cancellables)
     }
 
+    // New handler function to manage state changes
+    private func syncStateDidChange(to enabled: Bool) {
+        logger.debug("🎯 syncStateDidChange called with enabled: \(enabled)")
+        if enabled {
+            startPeriodicSync()
+            updateLightTemperatureForNightShift()
+        } else {
+            stopPeriodicSync()
+        }
+    }
+
     private func startPeriodicSync() {
-        guard appState.syncWithNightShift else { return }
+        // The decision to start is now handled by syncStateDidChange.
+        // This function's only job is to start the timer.
         stopPeriodicSync()
         syncTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            self?.updateLightTemperatureForNightShift()
+            guard let self else {
+                return
+            }
+            // This check inside the timer loop remains critical for stopping
+            // when the state changes during operation.
+            if !self.appState.syncWithNightShift {
+                self.logger.debug("Timer detected sync disabled, stopping")
+                self.stopPeriodicSync()
+                return
+            }
+            self.updateLightTemperatureForNightShift()
         }
-        logger.info("Started periodic Night Shift sync (every 1 second)")
+        logger.info("✅ Started periodic Night Shift sync (every 1 second)")
     }
 
     private func stopPeriodicSync() {
@@ -209,6 +227,12 @@ class NightShiftSyncController {
                     strength = 0.5 // Fallback for the very first run
                 }
             } else {
+                // Always log current strength for debugging
+                logger
+                    .debug(
+                        "Current strength: \(strength), last: \(self.lastStrength), stuck counter: \(self.stuckStrengthCounter)"
+                    )
+
                 // Log when strength actually changes and check for stuck values
                 if abs(strength - lastStrength) > 0.01 { // Only log if change is significant
                     logger.info("Night Shift strength changed: \(self.lastStrength) → \(strength)")
@@ -218,16 +242,19 @@ class NightShiftSyncController {
                     // Strength is unchanged. Check if it's the potentially stuck value.
                     if strength == 1.0 {
                         stuckStrengthCounter += 1
+                        if stuckStrengthCounter % 10 == 0 { // Log every 10 seconds when stuck at 1.0
+                            logger.debug("Strength stuck at 1.0 for \(self.stuckStrengthCounter) seconds")
+                        }
                     } else {
                         stuckStrengthCounter = 0 // Reset if it's not the stuck value
                     }
                 }
 
                 // Proactive recovery for stuck value
-                if stuckStrengthCounter > 30 {
+                if stuckStrengthCounter > 120 { // Increased from 30 to 120 seconds (2 minutes)
                     logger
                         .warning(
-                            "Strength value has been 1.0 for 30+ seconds. Proactively invalidating client."
+                            "Strength value has been 1.0 for 120+ seconds. Proactively invalidating client."
                         )
                     invalidateBlueLightClient()
                     stuckStrengthCounter = 0 // Reset after invalidating
