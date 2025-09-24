@@ -29,7 +29,8 @@ Requires macOS 14 or later.
 
 ## Screenshots
 
-![Demo](Meta/demo.gif) ![Menu](Meta/Menu_readme_v1_6_0.png)
+![Demo](Meta/demo.gif)
+<img src="Meta/Menu_readme_v1_6_0.avif" width="285" alt="Menu">
 
 ## How to Use
 
