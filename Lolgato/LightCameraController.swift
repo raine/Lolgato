@@ -22,9 +22,10 @@ class LightCameraController {
     }
 
     private func setupSubscriptions() {
-        appState.$lightsOnWithCamera
-            .sink { [weak self] newValue in
-                self?.handleLightsOnWithCameraChange(newValue)
+        appState.objectWillChange
+            .sink { [weak self] _ in
+                guard let self else { return }
+                self.handleLightsOnWithCameraChange(self.appState.lightsOnWithCamera)
             }
             .store(in: &cancellables)
 

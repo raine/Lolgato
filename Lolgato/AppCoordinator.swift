@@ -4,34 +4,41 @@ import os
 import SwiftUI
 
 class AppState: ObservableObject {
-    @Published var lightsOnWithCamera: Bool {
-        didSet {
-            UserDefaults.standard.set(lightsOnWithCamera, forKey: "lightsOnWithCamera")
-        }
-    }
+    @AppStorage("lightsOnWithCamera") var lightsOnWithCamera: Bool = false
+    @AppStorage("lightsOffOnSleep") var lightsOffOnSleep: Bool = false
+    @AppStorage("syncWithNightShift") var syncWithNightShift: Bool = false
+    @AppStorage("wakeOnCameraDetectionEnabled") var wakeOnCameraDetectionEnabled: Bool = false
 
-    @Published var lightsOffOnSleep: Bool {
-        didSet {
-            UserDefaults.standard.set(lightsOffOnSleep, forKey: "lightsOffOnSleep")
-        }
-    }
+    @AppStorage("wakeOnCameraInfoJSON") private var wakeOnCameraInfoJSON: String = ""
 
-    @Published var syncWithNightShift: Bool {
+    @Published var selectedCamera: StoredCameraInfo? {
         didSet {
-            UserDefaults.standard.set(syncWithNightShift, forKey: "syncWithNightShift")
+            if let newCamera = selectedCamera,
+               let data = try? JSONEncoder().encode(newCamera),
+               let jsonString = String(data: data, encoding: .utf8)
+            {
+                wakeOnCameraInfoJSON = jsonString
+            } else {
+                wakeOnCameraInfoJSON = ""
+            }
         }
     }
 
     init() {
-        lightsOnWithCamera = UserDefaults.standard.bool(forKey: "lightsOnWithCamera")
-        lightsOffOnSleep = UserDefaults.standard.bool(forKey: "lightsOffOnSleep")
-        syncWithNightShift = UserDefaults.standard.bool(forKey: "syncWithNightShift")
+        if let data = wakeOnCameraInfoJSON.data(using: .utf8),
+           let cameraInfo = try? JSONDecoder().decode(StoredCameraInfo.self, from: data)
+        {
+            self.selectedCamera = cameraInfo
+        } else {
+            self.selectedCamera = nil
+        }
     }
 }
 
 class AppCoordinator: ObservableObject {
     @Published var appState: AppState
     @Published var deviceManager: ElgatoDeviceManager
+    let cameraMonitor: CameraMonitor
 
     lazy var lightCameraController: LightCameraController = .init(
         deviceManager: deviceManager,
@@ -64,6 +71,7 @@ class AppCoordinator: ObservableObject {
         deviceManager = ElgatoDeviceManager(discovery: discovery)
         appState = AppState()
         cameraDetector = CameraUsageDetector()
+        cameraMonitor = CameraMonitor()
 
         setupControllers()
         setupBindings()
@@ -82,9 +90,10 @@ class AppCoordinator: ObservableObject {
     }
 
     private func setupBindings() {
-        appState.$lightsOnWithCamera
-            .sink { [weak self] enabled in
-                self?.cameraDetector.updateMonitoring(enabled: enabled)
+        appState.objectWillChange
+            .sink { [weak self] _ in
+                guard let self else { return }
+                self.cameraDetector.updateMonitoring(enabled: self.appState.lightsOnWithCamera)
             }
             .store(in: &cancellables)
     }

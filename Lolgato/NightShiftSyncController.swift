@@ -69,11 +69,12 @@ class NightShiftSyncController {
     }
 
     private func setupSubscriptions() {
-        appState.$syncWithNightShift
-            .sink { [weak self] enabled in
-                self?.logger.info("Night Shift sync setting changed to: \(enabled, privacy: .public)")
-                // Delegate to a handler that uses the value from the subscription
-                self?.syncStateDidChange(to: enabled)
+        appState.objectWillChange
+            .sink { [weak self] _ in
+                guard let self else { return }
+                let enabled = self.appState.syncWithNightShift
+                self.logger.info("Night Shift sync setting changed to: \(enabled, privacy: .public)")
+                self.syncStateDidChange(to: enabled)
             }
             .store(in: &cancellables)
     }

@@ -5,17 +5,13 @@ import SwiftUI
 struct SettingsView: View {
     @ObservedObject var appState: AppState
     @ObservedObject var deviceManager: ElgatoDeviceManager
-
-    init(appState: AppState, deviceManager: ElgatoDeviceManager) {
-        self.appState = appState
-        self.deviceManager = deviceManager
-    }
+    @ObservedObject var cameraMonitor: CameraMonitor
 
     var body: some View {
         TabView {
-            GeneralSettingsView(appState: appState)
+            AutomationSettingsView(appState: appState, cameraMonitor: cameraMonitor)
                 .tabItem {
-                    Label("General", systemImage: "gear")
+                    Label("Automation", systemImage: "switch.2")
                 }
 
             DeviceSettingsView(deviceManager: deviceManager)
@@ -27,6 +23,11 @@ struct SettingsView: View {
                 .tabItem {
                     Label("Shortcuts", systemImage: "keyboard")
                 }
+
+            GeneralSettingsView()
+                .tabItem {
+                    Label("General", systemImage: "gear")
+                }
         }
         .padding(20)
         .frame(width: 600, height: 480)
@@ -34,34 +35,28 @@ struct SettingsView: View {
 }
 
 struct GeneralSettingsView: View {
-    @ObservedObject var appState: AppState
+    let updateChecker = GitHubUpdateChecker()
 
     var body: some View {
         VStack(spacing: 20) {
-            settingRow(label: "Camera:") {
-                Toggle("Lights on automatically", isOn: $appState.lightsOnWithCamera)
-            } caption: {
-                Text("Turn on lights when camera is in use.")
-            }
-
-            settingRow(label: "Sleep:") {
-                Toggle("Lights on and off automatically", isOn: $appState.lightsOffOnSleep)
-            } caption: {
-                Text(
-                    "Turn off lights when system goes to sleep or is locked, and turn them back on when waking up."
-                )
-            }
-
-            settingRow(label: "Night Shift:") {
-                Toggle("Sync with Night Shift", isOn: $appState.syncWithNightShift)
-            } caption: {
-                Text("Automatically adjust light temperature to match macOS Night Shift.")
+            settingRow(label: "Launch:") {
+                LaunchAtLogin.Toggle("Automatically at system startup")
             }
 
             Divider()
 
-            settingRow(label: "Launch:") {
-                LaunchAtLogin.Toggle("Automatically at system startup")
+            settingRow(label: "Updates:") {
+                Button("Check for Updates") {
+                    updateChecker.checkForNewRelease { isNew, version in
+                        DispatchQueue.main.async {
+                            if isNew, let version {
+                                updateChecker.promptForUpdate(newVersion: version)
+                            } else {
+                                updateChecker.promptForNoUpdate()
+                            }
+                        }
+                    }
+                }
             }
 
             Spacer()
@@ -71,9 +66,6 @@ struct GeneralSettingsView: View {
     }
 
     private func resetToDefaults() {
-        appState.lightsOnWithCamera = false
-        appState.lightsOffOnSleep = false
-        appState.syncWithNightShift = false
         LaunchAtLogin.isEnabled = false
     }
 }

@@ -23,9 +23,10 @@ class LightSystemStateController {
     }
 
     private func setupSubscriptions() {
-        appState.$lightsOffOnSleep
-            .sink { [weak self] newValue in
-                self?.handleLightsOffOnSleepChange(newValue)
+        appState.objectWillChange
+            .sink { [weak self] _ in
+                guard let self else { return }
+                self.handleLightsOffOnSleepChange(self.appState.lightsOffOnSleep)
             }
             .store(in: &cancellables)
     }
@@ -147,37 +148,55 @@ class LightSystemStateController {
     }
 
     @objc private func handleWakeUp(notification: Notification) {
-        guard appState.lightsOffOnSleep else { return }
-        guard lightsWereTurnedOff else { return }
+        guard appState.lightsOffOnSleep, lightsWereTurnedOff else { return }
 
-        let reason = switch notification.name {
-        case NSWorkspace.didWakeNotification:
-            "computer wake"
-        case NSWorkspace.screensDidWakeNotification:
-            "screen wake"
-        default:
-            "unknown reason"
+        let wakeReason = notification.name.rawValue
+
+        Task {
+            if appState.wakeOnCameraDetectionEnabled {
+                guard let targetCameraId = appState.selectedCamera?.id else {
+                    logger.warning("Wake condition enabled, but no camera is selected. Lights will remain off.")
+                    lightsWereTurnedOff = false
+                    return
+                }
+
+                logger.info("Wake condition requires camera presence. Checking for camera: \(targetCameraId, privacy: .public)")
+                let cameraIsConnected = isTargetCameraConnected(id: targetCameraId)
+
+                if !cameraIsConnected {
+                    logger.warning("Wake condition NOT met: Target camera '\(self.appState.selectedCamera?.name ?? "Unknown", privacy: .public)' is not connected. Lights will remain off.")
+                    lightsWereTurnedOff = false
+                    return
+                }
+                logger.info("Wake condition met: Target camera found.")
+            }
+
+            logger.info("System waking up due to \(wakeReason, privacy: .public). Turning lights back on.")
+            turnOnAllManagedLights(reason: wakeReason)
+            lightsWereTurnedOff = false
+        }
+    }
+
+    private func isTargetCameraConnected(id: String) -> Bool {
+        guard !id.isEmpty else {
+            logger.warning("Camera check enabled, but no camera is selected in settings.")
+            return false
         }
 
-        logger.info("System waking up due to \(reason, privacy: .public). Turning on lights.")
+        let availableCameras = CameraManager.getAvailableCameras()
+        return availableCameras.contains { $0.id == id }
+    }
 
+    private func turnOnAllManagedLights(reason: String) {
         for device in deviceManager.devices where device.isOnline && device.isManaged {
             Task {
                 do {
                     try await device.turnOn()
-                    logger
-                        .info(
-                            "Turned on device: \(device.name, privacy: .public) due to \(reason, privacy: .public)"
-                        )
+                    logger.info("Turned on device: \(device.name, privacy: .public) due to \(reason, privacy: .public)")
                 } catch {
-                    logger
-                        .error(
-                            "Failed to turn on device: \(device.name) due to \(reason). Error: \(error.localizedDescription)"
-                        )
+                    logger.error("Failed to turn on device: \(device.name) due to \(reason). Error: \(error.localizedDescription)")
                 }
             }
         }
-
-        lightsWereTurnedOff = false
     }
 }

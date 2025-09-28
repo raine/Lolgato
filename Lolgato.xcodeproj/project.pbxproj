@@ -21,6 +21,9 @@
 		F741EA6D2CA2EDAF002D1BAD /* GithubUpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = F741EA6C2CA2EDAB002D1BAD /* GithubUpdateChecker.swift */; };
 		F741EA6F2CA37933002D1BAD /* LogUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = F741EA6E2CA37929002D1BAD /* LogUtils.swift */; };
 		F741EA712CA45408002D1BAD /* URLExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F741EA702CA45405002D1BAD /* URLExtension.swift */; };
+		F79AC56B2E890F96008D68F4 /* AutomationSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F79AC5692E890F96008D68F4 /* AutomationSettingsView.swift */; };
+		F79AC56C2E890F96008D68F4 /* CameraManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F79AC56A2E890F96008D68F4 /* CameraManager.swift */; };
+		F79AC56E2E891477008D68F4 /* CameraMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F79AC56D2E891477008D68F4 /* CameraMonitor.swift */; };
 		F7A3B4572D9870F300F29741 /* DeviceSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7A3B4562D9870F300F29741 /* DeviceSettingsView.swift */; };
 		F7EC5EE92CA160C0000EFB2C /* LightSystemStateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7EC5EE82CA160C0000EFB2C /* LightSystemStateController.swift */; };
 		F7EC5EEB2CA16116000EFB2C /* LolgatoMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7EC5EEA2CA16116000EFB2C /* LolgatoMenu.swift */; };
@@ -66,6 +69,9 @@
 		F741EA6C2CA2EDAB002D1BAD /* GithubUpdateChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GithubUpdateChecker.swift; sourceTree = "<group>"; };
 		F741EA6E2CA37929002D1BAD /* LogUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogUtils.swift; sourceTree = "<group>"; };
 		F741EA702CA45405002D1BAD /* URLExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLExtension.swift; sourceTree = "<group>"; };
+		F79AC5692E890F96008D68F4 /* AutomationSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutomationSettingsView.swift; sourceTree = "<group>"; };
+		F79AC56A2E890F96008D68F4 /* CameraManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraManager.swift; sourceTree = "<group>"; };
+		F79AC56D2E891477008D68F4 /* CameraMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraMonitor.swift; sourceTree = "<group>"; };
 		F7A3B4562D9870F300F29741 /* DeviceSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceSettingsView.swift; sourceTree = "<group>"; };
 		F7EC5EE82CA160C0000EFB2C /* LightSystemStateController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightSystemStateController.swift; sourceTree = "<group>"; };
 		F7EC5EEA2CA16116000EFB2C /* LolgatoMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LolgatoMenu.swift; sourceTree = "<group>"; };
@@ -130,6 +136,9 @@
 		F71906962C9CC444008D50F6 /* Lolgato */ = {
 			isa = PBXGroup;
 			children = (
+				F79AC56D2E891477008D68F4 /* CameraMonitor.swift */,
+				F79AC5692E890F96008D68F4 /* AutomationSettingsView.swift */,
+				F79AC56A2E890F96008D68F4 /* CameraManager.swift */,
 				F70A653D2E81B94D00A1ACC4 /* NightShiftSyncController.swift */,
 				F7A3B4562D9870F300F29741 /* DeviceSettingsView.swift */,
 				F741EA702CA45405002D1BAD /* URLExtension.swift */,
@@ -304,6 +313,8 @@
 				F71906CA2C9DC467008D50F6 /* ElgatoDiscovery.swift in Sources */,
 				F71906CE2C9E3177008D50F6 /* CameraUsageDetector.swift in Sources */,
 				F7EC5EE92CA160C0000EFB2C /* LightSystemStateController.swift in Sources */,
+				F79AC56B2E890F96008D68F4 /* AutomationSettingsView.swift in Sources */,
+				F79AC56C2E890F96008D68F4 /* CameraManager.swift in Sources */,
 				F7EC5EED2CA16135000EFB2C /* AppCoordinator.swift in Sources */,
 				F710AF022CA1B81800A23571 /* Constants.swift in Sources */,
 				F71906982C9CC444008D50F6 /* LolgatoApp.swift in Sources */,
@@ -313,6 +324,7 @@
 				F71906D02C9EDF86008D50F6 /* LightCameraController.swift in Sources */,
 				F71906C82C9DC13B008D50F6 /* ElgatoDeviceManager.swift in Sources */,
 				F7A3B4572D9870F300F29741 /* DeviceSettingsView.swift in Sources */,
+				F79AC56E2E891477008D68F4 /* CameraMonitor.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

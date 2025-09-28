@@ -11,7 +11,11 @@ struct LolgatoApp: App {
         .menuBarExtraStyle(.menu)
 
         Settings {
-            SettingsView(appState: coordinator.appState, deviceManager: coordinator.deviceManager)
+            SettingsView(
+                appState: coordinator.appState,
+                deviceManager: coordinator.deviceManager,
+                cameraMonitor: coordinator.cameraMonitor
+            )
         }
     }
 }
