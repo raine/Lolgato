@@ -93,3 +93,8 @@ endorsed by, or in any way officially connected with Elgato or Corsair Gaming,
 Inc. All product and company names are trademarks™ or registered® trademarks
 of their respective holders. Use of them does not imply any affiliation with or
 endorsement by them.
+
+## Other Apps
+
+- [KeepMic](https://zendit.fi/keepmic) - A simple macOS menu bar app that
+  automatically keeps your preferred microphone as the default input device.
