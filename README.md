@@ -27,6 +27,8 @@ the standard Elgato Control Center software.
 
 Requires macOS 14 or later.
 
+See [CHANGELOG.md](CHANGELOG.md) for release notes and version history.
+
 ## Screenshots
 
 ![Demo](Meta/demo.gif)
