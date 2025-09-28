@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.7.0 (28.09.2025)
+
+- Add setting to not turn on light on wake up if the configured camera is not
+  connected. This is useful for preventing light from turning on after wake up
+  in another place than the desk where you typically use your light at.
+
 ## 1.6.0 (24.09.2025)
 
 - Add night shift sync feature to automatically adjust lights with macOS Night
