@@ -96,5 +96,8 @@ endorsement by them.
 
 ## Other Apps
 
+- [WalkingMate](https://walkingmate.zendit.fi) - Control your WalkingPad
+  treadmill directly from your Mac menu bar. Track workouts, adjust speed, and
+  stay active while you work.
 - [KeepMic](https://zendit.fi/keepmic) - A simple macOS menu bar app that
   automatically keeps your preferred microphone as the default input device.
