@@ -1,0 +1,91 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Run Lolgato app and auto-restart when binary changes (after rebuilds)
+
+project_dir=$(git rev-parse --show-toplevel)
+derived_data_path="$HOME/Library/Developer/Xcode/DerivedData"
+app_name="Lolgato"
+
+# Find the app binary
+find_binary() {
+	# Find the most recent DerivedData directory for Lolgato
+	local dd_dir
+	dd_dir=$(find "$derived_data_path" -maxdepth 1 -type d -name "${app_name}-*" -print0 2>/dev/null | xargs -0 ls -dt 2>/dev/null | head -1)
+
+	if [[ -n "$dd_dir" ]]; then
+		local binary="$dd_dir/Build/Products/Debug/${app_name}.app/Contents/MacOS/${app_name}"
+		if [[ -f "$binary" ]]; then
+			echo "$binary"
+			return 0
+		fi
+	fi
+
+	return 1
+}
+
+# Check dependencies
+check_deps() {
+	if ! command -v fswatch &>/dev/null; then
+		echo "fswatch not found. Installing via Homebrew..."
+		brew install fswatch
+	fi
+	if ! command -v ts &>/dev/null; then
+		echo "ts not found. Installing moreutils via Homebrew..."
+		brew install moreutils
+	fi
+	if ! command -v unbuffer &>/dev/null; then
+		echo "unbuffer not found. Installing expect via Homebrew..."
+		brew install expect
+	fi
+}
+
+# Kill the running app if it exists
+kill_app() {
+	pkill -x "$app_name" 2>/dev/null || true
+}
+
+# Start the app
+start_app() {
+	local binary="$1"
+	shift
+	unbuffer "$binary" "$@" | ts '[%H:%M:%S]' &
+}
+
+# Cleanup on exit
+cleanup() {
+	echo -e "\nStopping $app_name..."
+	kill_app
+	exit 0
+}
+
+main() {
+	check_deps
+
+	local binary
+	binary=$(find_binary) || {
+		echo "Building app first..."
+		"$project_dir/scripts/build-debug"
+		binary=$(find_binary)
+	}
+
+	trap cleanup SIGINT SIGTERM
+
+	echo "[$(date +%H:%M:%S)] Starting $app_name (auto-restart on rebuild)"
+	[[ $# -gt 0 ]] && echo "[$(date +%H:%M:%S)] Args: $*"
+
+	# Initial start
+	kill_app
+	sleep 0.2
+	start_app "$binary" "$@"
+
+	# Watch for binary changes and restart
+	fswatch -o "$binary" | while read -r _; do
+		echo -e "[$(date +%H:%M:%S)] Binary changed, restarting..."
+		kill_app
+		sleep 0.2
+		start_app "$binary" "$@"
+	done
+}
+
+main "$@"

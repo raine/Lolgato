@@ -8,6 +8,10 @@ check: format build
 format:
     ./scripts/format-swift
 
-# Build the project
+# Build Mac app
 build:
     ./scripts/build-debug
+
+# Run app with auto-restart on rebuild
+dev *args:
+    ./scripts/run-dev {{args}}
