@@ -1,0 +1,3 @@
+panes:
+  - command: claude
+    focus: true
