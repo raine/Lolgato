@@ -27,3 +27,11 @@ build-dmg:
 # Clean build, package DMG, and release
 release:
     ./scripts/build-and-release
+
+# Build and install to /Applications (release)
+install:
+    ./scripts/build-install
+
+# Build and install dev version to /Applications
+install-dev:
+    ./scripts/build-install --dev

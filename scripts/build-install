@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+project_dir=$(git rev-parse --show-toplevel)
+cd "$project_dir"
+
+project_name="Lolgato"
+install_path="/Applications/$project_name.app"
+
+# Parse arguments
+dev_mode=false
+for arg in "$@"; do
+	case $arg in
+	--dev)
+		dev_mode=true
+		;;
+	esac
+done
+
+if [ "$dev_mode" = true ]; then
+	# Development build
+	echo "Building development version..."
+	xcodebuild build \
+		-project "$project_name.xcodeproj" \
+		-scheme "$project_name" \
+		-configuration Debug \
+		-quiet
+
+	# Find the app in DerivedData
+	derived_data_path="$HOME/Library/Developer/Xcode/DerivedData"
+	dd_dir=$(find "$derived_data_path" -maxdepth 1 -type d -name "${project_name}-*" -print0 2>/dev/null | xargs -0 ls -dt 2>/dev/null | head -1)
+	app_path="$dd_dir/Build/Products/Debug/$project_name.app"
+else
+	# Release build with notarization
+	echo "Building release..."
+	./scripts/archive
+	app_path="build/$project_name.app"
+fi
+
+# Check if app is running and quit it
+if pgrep -x "$project_name" >/dev/null; then
+	echo "Quitting running $project_name..."
+	osascript -e "tell application \"$project_name\" to quit"
+	sleep 1
+fi
+
+# Remove old version and install new one
+echo "Installing to /Applications..."
+rm -rf "$install_path"
+cp -R "$app_path" "$install_path"
+
+if [ "$dev_mode" = true ]; then
+	echo "Installed $project_name to /Applications (debug build)"
+else
+	echo "Installed $project_name to /Applications (release build)"
+fi
