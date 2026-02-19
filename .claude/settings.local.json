@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./scripts/build-debug:*)",
+      "Bash(/usr/bin/grep:*)",
+      "Bash(osascript:*)",
+      "Bash(pkill:*)"
+    ]
+  }
+}

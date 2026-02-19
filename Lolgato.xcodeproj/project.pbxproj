@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 60;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -260,7 +260,7 @@
 			);
 			mainGroup = F719068B2C9CC444008D50F6;
 			packageReferences = (
-				F7EC5EF72CA173E7000EFB2C /* XCLocalSwiftPackageReference "../../git/KeyboardShortcuts" */,
+				F7EC5EF72CA173E7000EFB2C /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
 				F7F6F5B52CA1746E00D0CF5F /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */,
 				F70476072CA46DBA0084A2A2 /* XCRemoteSwiftPackageReference "SettingsAccess" */,
 			);
@@ -492,7 +492,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Lolgato/Preview Content\"";
-				DEVELOPMENT_TEAM = YG824X87Y2;
+				DEVELOPMENT_TEAM = LFG6JGW3QQ;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -528,7 +528,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Lolgato/Preview Content\"";
-				DEVELOPMENT_TEAM = YG824X87Y2;
+				DEVELOPMENT_TEAM = LFG6JGW3QQ;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -663,17 +663,18 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		F7EC5EF72CA173E7000EFB2C /* XCLocalSwiftPackageReference "../../git/KeyboardShortcuts" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../../git/KeyboardShortcuts;
-		};
-/* End XCLocalSwiftPackageReference section */
-
 /* Begin XCRemoteSwiftPackageReference section */
 		F70476072CA46DBA0084A2A2 /* XCRemoteSwiftPackageReference "SettingsAccess" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/orchetect/SettingsAccess";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
+		F7EC5EF72CA173E7000EFB2C /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/KeyboardShortcuts";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 2.0.0;
@@ -697,7 +698,7 @@
 		};
 		F7F6F5B32CA1744900D0CF5F /* KeyboardShortcuts */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = F7EC5EF72CA173E7000EFB2C /* XCLocalSwiftPackageReference "../../git/KeyboardShortcuts" */;
+			package = F7EC5EF72CA173E7000EFB2C /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
 			productName = KeyboardShortcuts;
 		};
 		F7F6F5B62CA1747C00D0CF5F /* LaunchAtLogin */ = {
