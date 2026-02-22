@@ -26,7 +26,7 @@ class CameraUsageDetector {
         if enabled {
             logger.info("Starting camera polling")
             ensureCameraAccess { [weak self] granted in
-                guard let self, granted else {
+                guard let self, granted, self.isMonitoringEnabled else {
                     self?.logger.warning("Camera access not granted, cannot monitor camera usage")
                     return
                 }
@@ -41,7 +41,7 @@ class CameraUsageDetector {
     private func ensureCameraAccess(completion: @escaping (Bool) -> Void) {
         switch AVCaptureDevice.authorizationStatus(for: .video) {
         case .authorized:
-            completion(true)
+            DispatchQueue.main.async { completion(true) }
         case .notDetermined:
             AVCaptureDevice.requestAccess(for: .video) { granted in
                 DispatchQueue.main.async {
@@ -49,7 +49,7 @@ class CameraUsageDetector {
                 }
             }
         default:
-            completion(false)
+            DispatchQueue.main.async { completion(false) }
         }
     }
 
