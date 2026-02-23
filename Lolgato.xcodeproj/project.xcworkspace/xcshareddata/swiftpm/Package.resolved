@@ -1,6 +1,15 @@
 {
-  "originHash" : "68b505eba38c1a138cc5bd9479a7795530384ed7776d138f6f7a9028b8b37d25",
+  "originHash" : "df0a2b6f9eeeffd7b6f1548b5c63384436bad600c3e980fd5c6fce1d0ad48b00",
   "pins" : [
+    {
+      "identity" : "keyboardshortcuts",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/raine/KeyboardShortcuts",
+      "state" : {
+        "branch" : "main",
+        "revision" : "a3399994516400650303e8da434cd8545902162a"
+      }
+    },
     {
       "identity" : "launchatlogin-modern",
       "kind" : "remoteSourceControl",
