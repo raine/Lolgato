@@ -40,5 +40,6 @@ playground.xcworkspace
 build/
 
 **/__pycache__
+*.profraw
 .aider*
 .env
