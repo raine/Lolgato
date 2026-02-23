@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.7.1 (23.02.2026)
+
+- Fix camera detection on macOS 26.3 by requesting camera TCC authorization
+  before polling `kCMIODevicePropertyDeviceIsRunningSomewhere`.
+
 ## 1.7.0 (28.09.2025)
 
 - Add setting to not turn on light on wake up if the configured camera is not
