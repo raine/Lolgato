@@ -1,6 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+skip_notarization=false
+for arg in "$@"; do
+	case $arg in
+	--skip-notarization)
+		skip_notarization=true
+		;;
+	esac
+done
+
 project_dir=$(git rev-parse --show-toplevel)
 project_name="Lolgato"
 scheme_name="Lolgato"
@@ -37,7 +46,29 @@ EOF
 
 xcodebuild -exportArchive -archivePath "$archive_path" -exportPath "$export_path" -exportOptionsPlist export_options.plist
 
-echo "Build complete. .app file should be available at $export_path/$project_name.app"
-
 rm export_options.plist
 rm -rf "$archive_path"
+
+app_path="$export_path/$project_name.app"
+zip_path="$export_path/$project_name.zip"
+
+if [ "$skip_notarization" = true ]; then
+	echo "Build complete. App available at $app_path (notarization skipped)"
+else
+	# Zip the app for notarization
+	echo "Creating zip for notarization..."
+	ditto -c -k --keepParent "$app_path" "$zip_path"
+
+	# Notarize the app
+	echo "Submitting for notarization..."
+	xcrun notarytool submit "$zip_path" --keychain-profile "notarytool" --wait
+
+	# Staple the notarization ticket to the original app
+	echo "Stapling notarization ticket..."
+	xcrun stapler staple "$app_path"
+
+	# Clean up zip
+	rm "$zip_path"
+
+	echo "Build complete. Notarized app available at $app_path"
+fi

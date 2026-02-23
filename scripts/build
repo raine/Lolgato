@@ -6,8 +6,8 @@ cd "$project_dir" || exit 1
 project_name="Lolgato"
 app_path="build/$project_name.app"
 
-# Build the app
-./scripts/archive
+# Build the app (skip app notarization, we notarize the DMG instead)
+./scripts/archive --skip-notarization
 
 # Create DMG filename with version
 dmg_filename="${project_name}.dmg"
@@ -20,7 +20,7 @@ echo "Build and packaging complete. DMG created: $dmg_path"
 
 # Notarize the DMG
 echo "Submitting DMG for notarization..."
-xcrun notarytool submit "$dmg_path" --wait --apple-id "$APPLE_ID" --password "$APPLE_ID_PASSWORD" --team-id "$APPLE_TEAM_ID"
+xcrun notarytool submit "$dmg_path" --keychain-profile "notarytool" --wait
 
 # Staple the ticket to the DMG
 echo "Stapling notarization ticket to DMG..."

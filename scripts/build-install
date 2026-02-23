@@ -9,13 +9,19 @@ install_path="/Applications/$project_name.app"
 
 # Parse arguments
 dev_mode=false
+skip_notarization=false
 for arg in "$@"; do
 	case $arg in
 	--dev)
 		dev_mode=true
 		;;
+	--skip-notarization)
+		skip_notarization=true
+		;;
 	esac
 done
+
+mkdir -p build
 
 if [ "$dev_mode" = true ]; then
 	# Development build
@@ -31,9 +37,13 @@ if [ "$dev_mode" = true ]; then
 	dd_dir=$(find "$derived_data_path" -maxdepth 1 -type d -name "${project_name}-*" -print0 2>/dev/null | xargs -0 ls -dt 2>/dev/null | head -1)
 	app_path="$dd_dir/Build/Products/Debug/$project_name.app"
 else
-	# Release build with notarization
+	# Release build
 	echo "Building release..."
-	./scripts/archive
+	if [ "$skip_notarization" = true ]; then
+		./scripts/archive --skip-notarization
+	else
+		./scripts/archive
+	fi
 	app_path="build/$project_name.app"
 fi
 
@@ -49,8 +59,4 @@ echo "Installing to /Applications..."
 rm -rf "$install_path"
 cp -R "$app_path" "$install_path"
 
-if [ "$dev_mode" = true ]; then
-	echo "Installed $project_name to /Applications (debug build)"
-else
-	echo "Installed $project_name to /Applications (release build)"
-fi
+echo "Installed $project_name to /Applications"

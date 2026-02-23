@@ -28,7 +28,7 @@ build-dmg:
 release:
     ./scripts/build-and-release
 
-# Build and install to /Applications (release)
+# Build and install to /Applications (release, notarized)
 install:
     ./scripts/build-install
 
