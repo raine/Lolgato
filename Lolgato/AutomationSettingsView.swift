@@ -77,13 +77,13 @@ struct AutomationSettingsView: View {
 
             settingRow(label: "Shortcuts:") {
                 VStack(alignment: .leading, spacing: 8) {
-                    TextField("Shortcut to run when lights turn on", text: $appState.shortcutOnLightOn)
+                    TextField("Shortcut to run when camera turns on", text: $appState.shortcutOnCameraOn)
                         .textFieldStyle(.roundedBorder)
-                    TextField("Shortcut to run when lights turn off", text: $appState.shortcutOnLightOff)
+                    TextField("Shortcut to run when camera turns off", text: $appState.shortcutOnCameraOff)
                         .textFieldStyle(.roundedBorder)
                 }
             } caption: {
-                Text("Run an Apple Shortcut when lights change state. Enter the exact name of the Shortcut.")
+                Text("Run an Apple Shortcut when camera activity is detected. Enter the exact name of the Shortcut.")
             }
 
             Spacer()
@@ -103,7 +103,7 @@ struct AutomationSettingsView: View {
         appState.syncWithNightShift = false
         appState.wakeOnCameraDetectionEnabled = false
         appState.selectedCamera = nil
-        appState.shortcutOnLightOn = ""
-        appState.shortcutOnLightOff = ""
+        appState.shortcutOnCameraOn = ""
+        appState.shortcutOnCameraOff = ""
     }
 }

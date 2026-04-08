@@ -15,7 +15,7 @@ the standard Elgato Control Center software.
 - Automatically turn lights on and off based on camera activity
 - Turn lights off when locking your Mac
 - Sync light temperature with macOS Night Shift
-- Run Apple Shortcuts when lights turn on or off
+- Run Apple Shortcuts when camera turns on or off
 - Global keyboard shortcuts:
   - Toggle lights on and off
   - Toggle Night Shift synchronization
@@ -72,14 +72,13 @@ yellow/orange). When disabled, lights return to neutral daylight temperature
 (6500K). This creates a consistent lighting environment that matches your
 screen's color temperature.
 
-#### How can I trigger an Apple Shortcut when lights are turned on or off?
+#### How can I trigger an Apple Shortcut when the camera turns on or off?
 
 You can run an existing Shortcut by entering its name in Settings → Automation →
 Shortcuts. For example, if you have a Shortcut called "Upstairs Lights" that
 toggles your ceiling lights, enter "Upstairs Lights" in both the *Shortcut to
-run when lights turn on* and *Shortcut to run when lights turn off* fields. The
-Shortcut will run whenever Lolgato changes the light state (e.g. via camera
-automation, sleep/wake, or keyboard shortcuts).
+run when camera turns on* and *Shortcut to run when camera turns off* fields.
+The Shortcut will run whenever camera activity is detected.
 
 #### What if my devices aren't automatically discovered?
 

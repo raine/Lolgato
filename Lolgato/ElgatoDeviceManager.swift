@@ -45,7 +45,6 @@ struct StoredDeviceInfo: Codable {
 
 class ElgatoDevice: ObservableObject, Identifiable, Equatable, Hashable {
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "ElgatoDevice")
-    static let lightStateChanged = PassthroughSubject<Bool, Never>()
 
     let endpoint: NWEndpoint
     var isOnline: Bool = true
@@ -333,11 +332,9 @@ class ElgatoDevice: ObservableObject, Identifiable, Equatable, Hashable {
                 throw LightControlError.invalidResponse
             }
 
-            let newIsOn = (isOn == 1)
             await MainActor.run {
-                self.isOn = newIsOn
+                self.isOn = (isOn == 1)
             }
-            ElgatoDevice.lightStateChanged.send(newIsOn)
         } catch {
             throw LightControlError.networkError(error)
         }

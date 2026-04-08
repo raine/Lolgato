@@ -8,8 +8,8 @@ class AppState: ObservableObject {
     @AppStorage("lightsOffOnSleep") var lightsOffOnSleep: Bool = false
     @AppStorage("syncWithNightShift") var syncWithNightShift: Bool = false
     @AppStorage("wakeOnCameraDetectionEnabled") var wakeOnCameraDetectionEnabled: Bool = false
-    @AppStorage("shortcutOnLightOn") var shortcutOnLightOn: String = ""
-    @AppStorage("shortcutOnLightOff") var shortcutOnLightOff: String = ""
+    @AppStorage("shortcutOnCameraOn") var shortcutOnCameraOn: String = ""
+    @AppStorage("shortcutOnCameraOff") var shortcutOnCameraOff: String = ""
 
     @AppStorage("wakeOnCameraInfoJSON") private var wakeOnCameraInfoJSON: String = ""
 
@@ -59,7 +59,8 @@ class AppCoordinator: ObservableObject {
     )
 
     lazy var shortcutTriggerController: ShortcutTriggerController = .init(
-        appState: appState
+        appState: appState,
+        cameraStatusPublisher: cameraDetector.cameraStatusPublisher
     )
 
     private var cameraDetector: CameraUsageDetector
