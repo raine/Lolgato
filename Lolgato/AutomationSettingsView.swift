@@ -75,6 +75,17 @@ struct AutomationSettingsView: View {
                 Text("Automatically adjust light temperature to match macOS Night Shift.")
             }
 
+            settingRow(label: "Shortcuts:") {
+                VStack(alignment: .leading, spacing: 8) {
+                    TextField("Shortcut to run when camera turns on", text: $appState.shortcutOnCameraOn)
+                        .textFieldStyle(.roundedBorder)
+                    TextField("Shortcut to run when camera turns off", text: $appState.shortcutOnCameraOff)
+                        .textFieldStyle(.roundedBorder)
+                }
+            } caption: {
+                Text("Run an Apple Shortcut when camera activity is detected. Enter the exact name of the Shortcut.")
+            }
+
             Spacer()
             Divider()
             ResetButton(action: resetToDefaults)
@@ -92,5 +103,7 @@ struct AutomationSettingsView: View {
         appState.syncWithNightShift = false
         appState.wakeOnCameraDetectionEnabled = false
         appState.selectedCamera = nil
+        appState.shortcutOnCameraOn = ""
+        appState.shortcutOnCameraOff = ""
     }
 }
