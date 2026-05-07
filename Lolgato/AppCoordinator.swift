@@ -90,6 +90,11 @@ class AppCoordinator: ObservableObject {
     }
 
     private func setupBindings() {
+        // Apply persisted state immediately. objectWillChange only fires on
+        // user-driven changes, so without this the detector never starts when
+        // lightsOnWithCamera is already true at launch (issue #7).
+        cameraDetector.updateMonitoring(enabled: appState.lightsOnWithCamera)
+
         appState.objectWillChange
             .sink { [weak self] _ in
                 guard let self else { return }
