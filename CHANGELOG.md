@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.7.2 (27.05.2026)
+
+- Fix lights-on-with-camera not working after launching the app.
+
 ## 1.7.1 (23.02.2026)
 
 - Fix camera detection on macOS 26.3 by requesting camera TCC authorization
