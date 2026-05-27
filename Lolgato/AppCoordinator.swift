@@ -8,6 +8,8 @@ class AppState: ObservableObject {
     @AppStorage("lightsOffOnSleep") var lightsOffOnSleep: Bool = false
     @AppStorage("syncWithNightShift") var syncWithNightShift: Bool = false
     @AppStorage("wakeOnCameraDetectionEnabled") var wakeOnCameraDetectionEnabled: Bool = false
+    @AppStorage("shortcutOnCameraOn") var shortcutOnCameraOn: String = ""
+    @AppStorage("shortcutOnCameraOff") var shortcutOnCameraOff: String = ""
 
     @AppStorage("wakeOnCameraInfoJSON") private var wakeOnCameraInfoJSON: String = ""
 
@@ -56,6 +58,11 @@ class AppCoordinator: ObservableObject {
         appState: appState
     )
 
+    lazy var shortcutTriggerController: ShortcutTriggerController = .init(
+        appState: appState,
+        cameraStatusPublisher: cameraDetector.cameraStatusPublisher
+    )
+
     private var cameraDetector: CameraUsageDetector
     private var cancellables = Set<AnyCancellable>()
     private let logger = Logger(
@@ -87,6 +94,7 @@ class AppCoordinator: ObservableObject {
         _ = lightCameraController
         _ = lightSystemStateController
         _ = nightShiftSyncController
+        _ = shortcutTriggerController
     }
 
     private func setupBindings() {

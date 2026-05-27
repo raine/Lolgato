@@ -31,6 +31,7 @@
 		F7EC5EF12CA17259000EFB2C /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7EC5EF02CA17259000EFB2C /* Settings.swift */; };
 		F7F6F5B42CA1744900D0CF5F /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = F7F6F5B32CA1744900D0CF5F /* KeyboardShortcuts */; };
 		F7F6F5B72CA1747C00D0CF5F /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = F7F6F5B62CA1747C00D0CF5F /* LaunchAtLogin */; };
+		A10B00012EA2000000000001 /* ShortcutTriggerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10B00002EA2000000000001 /* ShortcutTriggerController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -77,6 +78,7 @@
 		F7EC5EEA2CA16116000EFB2C /* LolgatoMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LolgatoMenu.swift; sourceTree = "<group>"; };
 		F7EC5EEC2CA16135000EFB2C /* AppCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinator.swift; sourceTree = "<group>"; };
 		F7EC5EF02CA17259000EFB2C /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
+		A10B00002EA2000000000001 /* ShortcutTriggerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutTriggerController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -140,6 +142,7 @@
 				F79AC5692E890F96008D68F4 /* AutomationSettingsView.swift */,
 				F79AC56A2E890F96008D68F4 /* CameraManager.swift */,
 				F70A653D2E81B94D00A1ACC4 /* NightShiftSyncController.swift */,
+				A10B00002EA2000000000001 /* ShortcutTriggerController.swift */,
 				F7A3B4562D9870F300F29741 /* DeviceSettingsView.swift */,
 				F741EA702CA45405002D1BAD /* URLExtension.swift */,
 				F741EA6E2CA37929002D1BAD /* LogUtils.swift */,
@@ -321,6 +324,7 @@
 				F7EC5EF12CA17259000EFB2C /* Settings.swift in Sources */,
 				F741EA6D2CA2EDAF002D1BAD /* GithubUpdateChecker.swift in Sources */,
 				F70A653E2E81B94D00A1ACC4 /* NightShiftSyncController.swift in Sources */,
+				A10B00012EA2000000000001 /* ShortcutTriggerController.swift in Sources */,
 				F71906D02C9EDF86008D50F6 /* LightCameraController.swift in Sources */,
 				F71906C82C9DC13B008D50F6 /* ElgatoDeviceManager.swift in Sources */,
 				F7A3B4572D9870F300F29741 /* DeviceSettingsView.swift in Sources */,

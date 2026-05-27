@@ -1,0 +1,9 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "xcodebuild": true,
+        "/^sudo xcodebuild -runFirstLaunch$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}
