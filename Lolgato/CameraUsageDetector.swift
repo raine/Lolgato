@@ -54,6 +54,7 @@ class CameraUsageDetector {
     }
 
     private func startMonitoring(interval: TimeInterval) {
+        stopMonitoring()
         timer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { [weak self] _ in
             self?.checkCameraStatus()
         }
