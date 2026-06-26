@@ -8,6 +8,7 @@ class CameraUsageDetector {
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "CameraUsageDetector")
     private var lastActiveState: Bool?
     private var isMonitoringEnabled: Bool = false
+    private var didAllowVirtualDevices = false
 
     private let cameraStatusSubject = CurrentValueSubject<Bool, Never>(false)
     var cameraStatusPublisher: AnyPublisher<Bool, Never> {
@@ -55,8 +56,38 @@ class CameraUsageDetector {
 
     private func startMonitoring(interval: TimeInterval) {
         stopMonitoring()
+        allowVirtualCameraDevices()
         timer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { [weak self] _ in
             self?.checkCameraStatus()
+        }
+    }
+
+    /// CoreMediaIO hides virtual / DAL / screen-capture camera devices (e.g. Camo,
+    /// OBS Virtual Camera) from `kCMIOHardwarePropertyDevices` unless the process
+    /// opts in. Without this, only physical cameras are ever enumerated, so the
+    /// light never reacts to an iPhone-via-Camo call. Set once.
+    private func allowVirtualCameraDevices() {
+        guard !didAllowVirtualDevices else { return }
+        var propertyAddress = CMIOObjectPropertyAddress(
+            mSelector: CMIOObjectPropertySelector(kCMIOHardwarePropertyAllowScreenCaptureDevices),
+            mScope: CMIOObjectPropertyScope(kCMIOObjectPropertyScopeGlobal),
+            mElement: CMIOObjectPropertyElement(kCMIOObjectPropertyElementMain)
+        )
+        var allow: UInt32 = 1
+        let dataSize = UInt32(MemoryLayout<UInt32>.size)
+        let result = CMIOObjectSetPropertyData(
+            CMIOObjectID(kCMIOObjectSystemObject),
+            &propertyAddress,
+            0,
+            nil,
+            dataSize,
+            &allow
+        )
+        if result == kCMIOHardwareNoError {
+            didAllowVirtualDevices = true
+            logger.info("Enabled visibility of virtual/screen-capture camera devices")
+        } else {
+            logger.error("Failed to enable virtual camera visibility: \(result, privacy: .public)")
         }
     }
 
