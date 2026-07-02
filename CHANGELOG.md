@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.7.3 (02.07.2026)
 
 - Avoid peer-to-peer networking during device discovery.
 - Add a device discovery setting for manual IP-only setups.
