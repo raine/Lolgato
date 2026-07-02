@@ -4,7 +4,7 @@ set -euo pipefail
 skip_notarization=false
 for arg in "$@"; do
 	case $arg in
-	--skip-notarization)
+	--skip-notarization | --no-notarize)
 		skip_notarization=true
 		;;
 	esac

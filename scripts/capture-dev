@@ -1,0 +1,97 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Finds the tmux pane running "just dev" in the current project and captures its output
+
+show_help() {
+	cat <<EOF
+Usage: capture-dev [OPTIONS] [LINES]
+
+Capture output from the tmux pane running 'just dev' in the current project.
+By default, only shows output from the last binary run.
+
+Options:
+  -a, --all     Show all captured output, not just the last run
+  -h, --help    Show this help message
+
+Arguments:
+  LINES         Number of scrollback lines to capture (default: 1000)
+EOF
+}
+
+find_dev_pane() {
+	local project_dir pane_id pane_path tty current_pane
+	project_dir=$(pwd)
+	current_pane=${TMUX_PANE:-}
+
+	while IFS=$'\t' read -r pane_id pane_path tty; do
+		[[ "$pane_id" == "$current_pane" ]] && continue
+		[[ "$pane_path" != "$project_dir"* ]] && continue
+
+		# shellcheck disable=SC2009 # ps filters by pane TTY.
+		if ps -t "${tty#/dev/}" -o args= 2>/dev/null | grep -q "just dev"; then
+			echo "$pane_id"
+			return 0
+		fi
+	done < <(tmux list-panes -a -F '#{pane_id}	#{pane_current_path}	#{pane_tty}')
+
+	return 1
+}
+
+filter_last_run() {
+	awk '
+        /^\[..:..:..\] (Starting|Binary changed)/ {
+            buffer = $0 "\n"
+            capture = 1
+            next
+        }
+        capture { buffer = buffer $0 "\n" }
+        END { printf "%s", buffer }
+    '
+}
+
+main() {
+	local pane lines=1000 show_all=false output
+
+	while [[ $# -gt 0 ]]; do
+		case "$1" in
+		-a | --all)
+			show_all=true
+			shift
+			;;
+		-h | --help)
+			show_help
+			exit 0
+			;;
+		*)
+			lines=$1
+			shift
+			;;
+		esac
+	done
+
+	if ! command -v tmux >/dev/null 2>&1; then
+		echo "Error: tmux is not installed" >&2
+		exit 1
+	fi
+
+	if ! tmux info >/dev/null 2>&1; then
+		echo "Error: tmux server is not running" >&2
+		exit 1
+	fi
+
+	pane=$(find_dev_pane) || {
+		echo "Error: No pane running 'just dev' found" >&2
+		exit 1
+	}
+
+	output=$(tmux capture-pane -t "$pane" -p -S "-${lines}" | grep -v '^$' || true)
+
+	if [[ "$show_all" == true ]]; then
+		echo "$output"
+	else
+		echo "$output" | filter_last_run
+	fi
+}
+
+main "$@"

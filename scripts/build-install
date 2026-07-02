@@ -6,57 +6,72 @@ cd "$project_dir"
 
 project_name="Lolgato"
 install_path="/Applications/$project_name.app"
-
-# Parse arguments
 dev_mode=false
 skip_notarization=false
+
 for arg in "$@"; do
 	case $arg in
 	--dev)
 		dev_mode=true
 		;;
-	--skip-notarization)
+	--skip-notarization | --no-notarize)
 		skip_notarization=true
+		;;
+	*)
+		echo "Unknown argument: $arg" >&2
+		exit 1
 		;;
 	esac
 done
 
+quit_running_app() {
+	if pgrep -x "$project_name" >/dev/null; then
+		echo "Quitting running $project_name..."
+		osascript -e "tell application \"$project_name\" to quit"
+		sleep 1
+	fi
+}
+
+install_app() {
+	local app_path=$1
+
+	if [[ ! -d "$app_path" ]]; then
+		echo "Error: app not found at $app_path" >&2
+		exit 1
+	fi
+
+	echo "Installing to /Applications..."
+	rm -rf "$install_path"
+	cp -R "$app_path" "$install_path"
+}
+
 mkdir -p build
 
-if [ "$dev_mode" = true ]; then
-	# Development build
+if [[ "$dev_mode" == true ]]; then
 	echo "Building development version..."
+	app_path="build/Debug/$project_name.app"
 	xcodebuild build \
 		-project "$project_name.xcodeproj" \
 		-scheme "$project_name" \
 		-configuration Debug \
+		-derivedDataPath build/DerivedData \
+		CONFIGURATION_BUILD_DIR="$project_dir/build/Debug" \
 		-quiet
-
-	# Find the app in DerivedData
-	derived_data_path="$HOME/Library/Developer/Xcode/DerivedData"
-	dd_dir=$(find "$derived_data_path" -maxdepth 1 -type d -name "${project_name}-*" -print0 2>/dev/null | xargs -0 ls -dt 2>/dev/null | head -1)
-	app_path="$dd_dir/Build/Products/Debug/$project_name.app"
 else
-	# Release build
 	echo "Building release..."
-	if [ "$skip_notarization" = true ]; then
+	app_path="build/$project_name.app"
+	if [[ "$skip_notarization" == true ]]; then
 		./scripts/archive --skip-notarization
 	else
 		./scripts/archive
 	fi
-	app_path="build/$project_name.app"
 fi
 
-# Check if app is running and quit it
-if pgrep -x "$project_name" >/dev/null; then
-	echo "Quitting running $project_name..."
-	osascript -e "tell application \"$project_name\" to quit"
-	sleep 1
+quit_running_app
+install_app "$app_path"
+
+if [[ "$dev_mode" == true ]]; then
+	echo "Installed $project_name to /Applications (development)"
+else
+	echo "Installed $project_name to /Applications (release)"
 fi
-
-# Remove old version and install new one
-echo "Installing to /Applications..."
-rm -rf "$install_path"
-cp -R "$app_path" "$install_path"
-
-echo "Installed $project_name to /Applications"

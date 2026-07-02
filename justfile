@@ -16,6 +16,10 @@ build:
 dev *args:
     ./scripts/run-dev {{args}}
 
+# Capture output from dev pane
+capture:
+    ./scripts/capture-dev
+
 # Build release archive with notarization
 archive:
     ./scripts/archive

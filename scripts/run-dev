@@ -4,21 +4,16 @@ set -euo pipefail
 # Run Lolgato app and auto-restart when binary changes (after rebuilds)
 
 project_dir=$(git rev-parse --show-toplevel)
-derived_data_path="$HOME/Library/Developer/Xcode/DerivedData"
+derived_data_path="$project_dir/build"
 app_name="Lolgato"
 
 # Find the app binary
 find_binary() {
-	# Find the most recent DerivedData directory for Lolgato
-	local dd_dir
-	dd_dir=$(find "$derived_data_path" -maxdepth 1 -type d -name "${app_name}-*" -print0 2>/dev/null | xargs -0 ls -dt 2>/dev/null | head -1)
+	local binary="$derived_data_path/Build/Products/Debug/${app_name}.app/Contents/MacOS/${app_name}"
 
-	if [[ -n "$dd_dir" ]]; then
-		local binary="$dd_dir/Build/Products/Debug/${app_name}.app/Contents/MacOS/${app_name}"
-		if [[ -f "$binary" ]]; then
-			echo "$binary"
-			return 0
-		fi
+	if [[ -f "$binary" ]]; then
+		echo "$binary"
+		return 0
 	fi
 
 	return 1

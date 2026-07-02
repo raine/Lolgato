@@ -1,24 +1,35 @@
 #!/usr/bin/env bash
 
 # Build Lolgato Xcode project in Debug configuration
-# Usage: ./build-xcode
+# Usage: ./scripts/build-debug
 
 set -euo pipefail
 
-# Configuration variables
 project_name="Lolgato.xcodeproj"
 scheme_name="Lolgato"
 configuration="Debug"
-
-# Change to project root directory
 project_dir=$(git rev-parse --show-toplevel)
+
 cd "$project_dir" || exit 1
 
-# Verify Xcode project exists
 if [[ ! -d "$project_name" ]]; then
 	echo "Error: Xcode project '$project_name' not found in current directory" >&2
 	exit 1
 fi
 
-# Run xcodebuild
-xcodebuild -project "$project_name" -scheme "$scheme_name" -configuration "$configuration" build -quiet
+echo "Building $scheme_name scheme in $configuration configuration..."
+
+if xcodebuild \
+	-project "$project_name" \
+	-scheme "$scheme_name" \
+	-configuration "$configuration" \
+	-destination "platform=macOS,arch=arm64" \
+	-derivedDataPath "$project_dir/build" \
+	-quiet \
+	build 2>&1; then
+	echo "Build completed successfully"
+else
+	build_exit_code=$?
+	echo "Build failed with exit code $build_exit_code" >&2
+	exit "$build_exit_code"
+fi
