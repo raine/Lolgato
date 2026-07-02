@@ -23,7 +23,7 @@ the standard Elgato Control Center software.
 
 ## Download
 
-[Latest release v1.7.2: `Lolgato.dmg`](https://github.com/raine/lolgato/releases/latest/download/Lolgato.dmg)
+[Latest release v1.7.3: `Lolgato.dmg`](https://github.com/raine/lolgato/releases/latest/download/Lolgato.dmg)
 
 Requires macOS 14 or later.
 
