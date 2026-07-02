@@ -8,6 +8,7 @@ class AppState: ObservableObject {
     @AppStorage("lightsOffOnSleep") var lightsOffOnSleep: Bool = false
     @AppStorage("syncWithNightShift") var syncWithNightShift: Bool = false
     @AppStorage("wakeOnCameraDetectionEnabled") var wakeOnCameraDetectionEnabled: Bool = false
+    @AppStorage("automaticDeviceDiscoveryEnabled") var automaticDeviceDiscoveryEnabled: Bool = true
 
     @AppStorage("wakeOnCameraInfoJSON") private var wakeOnCameraInfoJSON: String = ""
 
@@ -79,7 +80,9 @@ class AppCoordinator: ObservableObject {
 
         Task { @MainActor in
             deviceManager.loadDevicesFromPersistentStorage()
-            deviceManager.startDiscovery()
+            if appState.automaticDeviceDiscoveryEnabled {
+                deviceManager.startDiscovery()
+            }
         }
     }
 

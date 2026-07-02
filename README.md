@@ -44,6 +44,7 @@ See [CHANGELOG.md](CHANGELOG.md) for release notes and version history.
 The app will discover Elgato lights in your network automatically, the same way
 as Elgato Control Center. If automatic discovery doesn't find your devices, you
 can add them manually by IP address in the Devices tab of the settings window.
+The Devices tab also has a discovery setting for IP-only setups.
 
 ## FAQ
 

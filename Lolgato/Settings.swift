@@ -14,7 +14,7 @@ struct SettingsView: View {
                     Label("Automation", systemImage: "switch.2")
                 }
 
-            DeviceSettingsView(deviceManager: deviceManager)
+            DeviceSettingsView(appState: appState, deviceManager: deviceManager)
                 .tabItem {
                     Label("Devices", systemImage: "lightbulb")
                 }

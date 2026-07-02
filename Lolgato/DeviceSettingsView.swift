@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct DeviceSettingsView: View {
+    @ObservedObject var appState: AppState
     @ObservedObject var deviceManager: ElgatoDeviceManager
     @State private var isAddingDevice = false
     @State private var newDeviceAddress = ""
@@ -35,7 +36,7 @@ struct DeviceSettingsView: View {
                 }
                 .buttonStyle(.bordered)
                 .disabled(isRefreshing)
-                .help(isRefreshing ? "Discovery in progress..." : "Refresh device list")
+                .help(isRefreshing ? "Refresh in progress..." : "Refresh device list")
 
                 Button(action: {
                     isAddingDevice = true
@@ -46,6 +47,14 @@ struct DeviceSettingsView: View {
                 .help("Add device manually")
             }
             .padding(.bottom, 8)
+
+            settingRow(label: "Discovery:") {
+                Toggle("Find devices automatically", isOn: $appState.automaticDeviceDiscoveryEnabled)
+            } caption: {
+                Text("Turn this off when every light is added by IP address.")
+            }
+
+            Divider()
 
             if deviceManager.devices.isEmpty {
                 VStack {
@@ -107,6 +116,13 @@ struct DeviceSettingsView: View {
                 }
             } else {
                 Text("No device selected to remove.")
+            }
+        }
+        .onChange(of: appState.automaticDeviceDiscoveryEnabled) { _, isEnabled in
+            if isEnabled {
+                deviceManager.startDiscovery()
+            } else {
+                deviceManager.stopDiscovery()
             }
         }
     }
@@ -266,13 +282,13 @@ struct DeviceSettingsView: View {
                 await group.waitForAll()
             }
 
-            // Stop discovery and wait a moment
-            deviceManager.stopDiscovery()
+            if appState.automaticDeviceDiscoveryEnabled {
+                deviceManager.stopDiscovery()
 
-            // Add a small delay to ensure browser state is fully reset
-            try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 second delay
+                try? await Task.sleep(nanoseconds: 1_000_000_000)
 
-            deviceManager.startDiscovery()
+                deviceManager.startDiscovery()
+            }
 
             // Add a minimum delay so the spinner is visible
             try? await Task.sleep(nanoseconds: 2_000_000_000) // 2 seconds
