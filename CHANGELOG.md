@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Avoid peer-to-peer networking during device discovery.
 - Add a device discovery setting for manual IP-only setups.
 
 ## 1.7.2 (27.05.2026)
