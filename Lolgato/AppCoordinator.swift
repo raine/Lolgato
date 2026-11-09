@@ -80,6 +80,7 @@ class AppCoordinator: ObservableObject {
 
         Task { @MainActor in
             deviceManager.loadDevicesFromPersistentStorage()
+            deviceManager.startUSBMonitoring()
             if appState.automaticDeviceDiscoveryEnabled {
                 deviceManager.startDiscovery()
             }
