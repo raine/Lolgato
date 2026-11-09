@@ -171,6 +171,8 @@ struct DeviceSettingsView: View {
                             .background(Color.clear)
                     }
                     .help("Click to select and copy")
+                } else if case .usb = device.connection {
+                    Text("USB")
                 } else {
                     Text("Unknown")
                 }

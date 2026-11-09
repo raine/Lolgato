@@ -1,5 +1,6 @@
 import Combine
 import Foundation
+import IOKit.hid
 import Network
 import os
 
@@ -43,10 +44,26 @@ struct StoredDeviceInfo: Codable {
     }
 }
 
+/// How the app reaches a light: over the network, or over USB for lights in USB mode.
+enum ElgatoConnection: Hashable, CustomStringConvertible {
+    case network(NWEndpoint)
+    case usb(serialNumber: String)
+
+    var description: String {
+        switch self {
+        case let .network(endpoint):
+            endpoint.debugDescription
+        case let .usb(serialNumber):
+            "USB \(serialNumber)"
+        }
+    }
+}
+
 class ElgatoDevice: ObservableObject, Identifiable, Equatable, Hashable {
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "ElgatoDevice")
 
-    let endpoint: NWEndpoint
+    let connection: ElgatoConnection
+    let transport: ElgatoTransport
     var isOnline: Bool = true
     var lastSeen: Date = .init()
     var isOn: Bool = false
@@ -60,25 +77,38 @@ class ElgatoDevice: ObservableObject, Identifiable, Equatable, Hashable {
     private var internalTemp: Int = 244 // Internal Elgato scale (143-344)
     @Published var macAddress: String
 
-    var id: NWEndpoint { endpoint }
+    var id: ElgatoConnection { connection }
+
+    /// The light's network endpoint, or nil for a light connected over USB.
+    var endpoint: NWEndpoint? {
+        if case let .network(endpoint) = connection {
+            return endpoint
+        }
+        return nil
+    }
 
     var name: String {
         displayName ?? productName
     }
 
-    init(endpoint: NWEndpoint) {
-        self.endpoint = endpoint
+    convenience init(endpoint: NWEndpoint) {
+        self.init(connection: .network(endpoint), transport: HTTPElgatoTransport(endpoint: endpoint))
+    }
+
+    init(connection: ElgatoConnection, transport: ElgatoTransport) {
+        self.connection = connection
+        self.transport = transport
         productName = ""
         macAddress = ""
         displayName = ""
     }
 
     static func == (lhs: ElgatoDevice, rhs: ElgatoDevice) -> Bool {
-        lhs.endpoint == rhs.endpoint
+        lhs.connection == rhs.connection
     }
 
     func hash(into hasher: inout Hasher) {
-        hasher.combine(endpoint)
+        hasher.combine(connection)
     }
 
     enum FetchError: Error {
@@ -101,20 +131,8 @@ class ElgatoDevice: ObservableObject, Identifiable, Equatable, Hashable {
             let temperature: Int
         }
 
-        guard case let .hostPort(host, port) = endpoint else {
-            throw FetchError.invalidEndpoint
-        }
-
-        let cleanHost = host.debugDescription.split(separator: "%").first.map(String.init) ?? host
-            .debugDescription
-        let urlString = "http://\(cleanHost):\(port)/elgato/lights"
-        guard let url = URL(string: urlString) else {
-            throw FetchError.invalidURL
-        }
-
         do {
-            logger.info("GET \(url, privacy: .public)")
-            let (data, _) = try await URLSession.shared.data(from: url)
+            let data = try await transport.request(method: "GET", path: "/elgato/lights", body: nil)
             let json = try JSONDecoder().decode(LightResponse.self, from: data)
 
             guard let lightStatus = json.lights.first else {
@@ -135,18 +153,8 @@ class ElgatoDevice: ObservableObject, Identifiable, Equatable, Hashable {
     }
 
     func fetchAccessoryInfo() async throws {
-        guard case let .hostPort(host, port) = endpoint else {
-            throw FetchError.invalidEndpoint
-        }
-
-        guard let url = URL.createFromNetworkEndpoint(host: host, port: port, path: "/elgato/accessory-info")
-        else {
-            throw FetchError.invalidURL
-        }
-
         do {
-            logger.info("GET \(url, privacy: .public)")
-            let (data, _) = try await URLSession.shared.data(from: url)
+            let data = try await transport.request(method: "GET", path: "/elgato/accessory-info", body: nil)
             let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
 
             guard let json else {
@@ -194,29 +202,9 @@ class ElgatoDevice: ObservableObject, Identifiable, Equatable, Hashable {
             return
         }
 
-        guard case let .hostPort(host, port) = endpoint else {
-            throw LightControlError.invalidEndpoint
-        }
-
-        guard let url = URL.createFromNetworkEndpoint(host: host, port: port, path: "/elgato/lights") else {
-            throw LightControlError.invalidURL
-        }
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "PUT"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
-        let data = ["numberOfLights": 1, "lights": [["brightness": level]]] as [String: Any]
-        request.httpBody = try JSONSerialization.data(withJSONObject: data)
-
         do {
-            let (responseData, _) = try await URLSession.shared.data(for: request)
-            let json = try JSONSerialization.jsonObject(with: responseData, options: []) as? [String: Any]
-
-            guard let lights = json?["lights"] as? [[String: Any]],
-                  let firstLight = lights.first,
-                  let brightness = firstLight["brightness"] as? Int
-            else {
+            let light = try await putLight(["brightness": level])
+            guard let brightness = light["brightness"] as? Int else {
                 throw LightControlError.invalidResponse
             }
 
@@ -257,29 +245,9 @@ class ElgatoDevice: ObservableObject, Identifiable, Equatable, Hashable {
 
         let internalValue = internalFromKelvin(kelvin)
 
-        guard case let .hostPort(host, port) = endpoint else {
-            throw LightControlError.invalidEndpoint
-        }
-
-        guard let url = URL.createFromNetworkEndpoint(host: host, port: port, path: "/elgato/lights") else {
-            throw LightControlError.invalidURL
-        }
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "PUT"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
-        let data = ["numberOfLights": 1, "lights": [["temperature": internalValue]]] as [String: Any]
-        request.httpBody = try JSONSerialization.data(withJSONObject: data)
-
         do {
-            let (responseData, _) = try await URLSession.shared.data(for: request)
-            let json = try JSONSerialization.jsonObject(with: responseData, options: []) as? [String: Any]
-
-            guard let lights = json?["lights"] as? [[String: Any]],
-                  let firstLight = lights.first,
-                  let temperature = firstLight["temperature"] as? Int
-            else {
+            let light = try await putLight(["temperature": internalValue])
+            guard let temperature = light["temperature"] as? Int else {
                 throw LightControlError.invalidResponse
             }
 
@@ -305,30 +273,9 @@ class ElgatoDevice: ObservableObject, Identifiable, Equatable, Hashable {
     }
 
     private func setLightState(on: Bool) async throws {
-        guard case let .hostPort(host, port) = endpoint else {
-            throw LightControlError.invalidEndpoint
-        }
-
-        guard let url = URL.createFromNetworkEndpoint(host: host, port: port, path: "/elgato/lights")
-        else {
-            throw LightControlError.invalidURL
-        }
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "PUT"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
-        let data = ["numberOfLights": 1, "lights": [["on": on ? 1 : 0]]] as [String: Any]
-        request.httpBody = try JSONSerialization.data(withJSONObject: data)
-
         do {
-            let (responseData, _) = try await URLSession.shared.data(for: request)
-            let json = try JSONSerialization.jsonObject(with: responseData, options: []) as? [String: Any]
-
-            guard let lights = json?["lights"] as? [[String: Any]],
-                  let firstLight = lights.first,
-                  let isOn = firstLight["on"] as? Int
-            else {
+            let light = try await putLight(["on": on ? 1 : 0])
+            guard let isOn = light["on"] as? Int else {
                 throw LightControlError.invalidResponse
             }
 
@@ -339,6 +286,18 @@ class ElgatoDevice: ObservableObject, Identifiable, Equatable, Hashable {
             throw LightControlError.networkError(error)
         }
     }
+
+    /// Sends `PUT /elgato/lights` with the given fields and returns the light's reported state.
+    private func putLight(_ fields: [String: Any]) async throws -> [String: Any] {
+        let body = try JSONSerialization.data(withJSONObject: ["numberOfLights": 1, "lights": [fields]])
+        let responseData = try await transport.request(method: "PUT", path: "/elgato/lights", body: body)
+        let json = try JSONSerialization.jsonObject(with: responseData, options: []) as? [String: Any]
+
+        guard let lights = json?["lights"] as? [[String: Any]], let firstLight = lights.first else {
+            throw LightControlError.invalidResponse
+        }
+        return firstLight
+    }
 }
 
 class ElgatoDeviceManager: ObservableObject {
@@ -346,6 +305,7 @@ class ElgatoDeviceManager: ObservableObject {
 
     @Published private(set) var devices: [ElgatoDevice] = []
     private let discovery: ElgatoDiscovery
+    private let usbMonitor = ElgatoUSBMonitor()
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "ElgatoDeviceManager")
     private var discoveryTask: Task<Void, Never>?
     let newDeviceDiscovered = PassthroughSubject<ElgatoDevice, Never>()
@@ -383,6 +343,52 @@ class ElgatoDeviceManager: ObservableObject {
         discovery.stopDiscovery()
     }
 
+    // MARK: - USB
+
+    /// Lights in USB mode don't appear on the network, so they are found by watching USB instead.
+    /// They are not persisted: each one is added again when it is plugged in.
+    @MainActor
+    func startUSBMonitoring() {
+        usbMonitor.onAttach = { [weak self] serialNumber, hidDevice in
+            self?.usbLightAttached(serialNumber: serialNumber, hidDevice: hidDevice)
+        }
+        usbMonitor.onDetach = { [weak self] serialNumber in
+            self?.usbLightDetached(serialNumber: serialNumber)
+        }
+        usbMonitor.start()
+    }
+
+    @MainActor
+    private func usbLightAttached(serialNumber: String, hidDevice: IOHIDDevice) {
+        let connection = ElgatoConnection.usb(serialNumber: serialNumber)
+
+        if let existingDevice = devices.first(where: { $0.connection == connection }),
+           let transport = existingDevice.transport as? USBHIDElgatoTransport
+        {
+            transport.attach(hidDevice)
+            existingDevice.isOnline = true
+            existingDevice.lastSeen = Date()
+            Task {
+                await fetchInitialDeviceState(for: existingDevice)
+            }
+        } else {
+            let transport = USBHIDElgatoTransport()
+            transport.attach(hidDevice)
+            addNewDevice(ElgatoDevice(connection: connection, transport: transport))
+        }
+        objectWillChange.send()
+    }
+
+    @MainActor
+    private func usbLightDetached(serialNumber: String) {
+        let connection = ElgatoConnection.usb(serialNumber: serialNumber)
+        guard let device = devices.first(where: { $0.connection == connection }) else { return }
+
+        (device.transport as? USBHIDElgatoTransport)?.detach()
+        device.isOnline = false
+        objectWillChange.send()
+    }
+
     @MainActor
     private func handleDiscoveryEvent(_ event: ElgatoDiscoveryEvent) {
         logger.info("Discovery event: \(event.debugDescription, privacy: .public)")
@@ -404,27 +410,31 @@ class ElgatoDeviceManager: ObservableObject {
             existingDevice.isOnline = true
             existingDevice.lastSeen = Date()
         } else {
-            let newDevice = ElgatoDevice(endpoint: endpoint)
-            newDevice.lastSeen = Date()
-
-            let maxOrder = devices.map(\.order).max() ?? -1
-            newDevice.order = maxOrder + 1
-
-            logger.info("New device found: \(endpoint.debugDescription, privacy: .public)")
-            devices.append(newDevice)
-            resubscribeToDeviceChanges()
-
-            newDeviceDiscovered.send(newDevice)
-
-            Task {
-                await fetchInitialDeviceState(for: newDevice)
-                // Save devices after discovering a new one
-                await MainActor.run {
-                    saveDevicesToPersistentStorage()
-                }
-            }
+            addNewDevice(ElgatoDevice(endpoint: endpoint))
         }
         objectWillChange.send()
+    }
+
+    @MainActor
+    private func addNewDevice(_ newDevice: ElgatoDevice) {
+        newDevice.lastSeen = Date()
+
+        let maxOrder = devices.map(\.order).max() ?? -1
+        newDevice.order = maxOrder + 1
+
+        logger.info("New device found: \(newDevice.connection, privacy: .public)")
+        devices.append(newDevice)
+        resubscribeToDeviceChanges()
+
+        newDeviceDiscovered.send(newDevice)
+
+        Task {
+            await fetchInitialDeviceState(for: newDevice)
+            // Save devices after discovering a new one
+            await MainActor.run {
+                saveDevicesToPersistentStorage()
+            }
+        }
     }
 
     @MainActor
@@ -449,7 +459,7 @@ class ElgatoDeviceManager: ObservableObject {
             await MainActor.run {
                 logger
                     .error(
-                        "Failed to fetch initial state for device: \(device.endpoint.debugDescription, privacy: .public), error: \(error.localizedDescription, privacy: .public)"
+                        "Failed to fetch initial state for device: \(device.connection, privacy: .public), error: \(error.localizedDescription, privacy: .public)"
                     )
             }
         }
@@ -697,7 +707,7 @@ class ElgatoDeviceManager: ObservableObject {
     func removeDevice(_ device: ElgatoDevice) {
         logger.info("Removing device: \(device.name, privacy: .public)")
 
-        if let index = devices.firstIndex(where: { $0.endpoint == device.endpoint }) {
+        if let index = devices.firstIndex(where: { $0.connection == device.connection }) {
             devices.remove(at: index)
             resubscribeToDeviceChanges()
             saveDevicesToPersistentStorage()
@@ -772,7 +782,7 @@ class ElgatoDeviceManager: ObservableObject {
 
     @MainActor
     func setDeviceManaged(_ device: ElgatoDevice, isManaged: Bool) {
-        if let index = devices.firstIndex(where: { $0.endpoint == device.endpoint }) {
+        if let index = devices.firstIndex(where: { $0.connection == device.connection }) {
             devices[index].isManaged = isManaged
             saveDevicesToPersistentStorage()
             objectWillChange.send()
@@ -795,7 +805,11 @@ class ElgatoDeviceManager: ObservableObject {
         return regex?.firstMatch(in: ipAddress, range: range) != nil
     }
 
-    private func areEndpointsEquivalent(_ endpoint1: NWEndpoint, _ endpoint2: NWEndpoint) -> Bool {
+    private func areEndpointsEquivalent(_ endpoint1: NWEndpoint?, _ endpoint2: NWEndpoint) -> Bool {
+        guard let endpoint1 else {
+            return false
+        }
+
         guard case let .hostPort(host1, port1) = endpoint1,
               case let .hostPort(host2, port2) = endpoint2
         else {
